@@ -962,6 +962,7 @@ export namespace Prisma {
     isAdmin: boolean | null
     isActive: boolean | null
     createdAt: Date | null
+    updatedAt: Date | null
   }
 
   export type UserMaxAggregateOutputType = {
@@ -972,6 +973,7 @@ export namespace Prisma {
     isAdmin: boolean | null
     isActive: boolean | null
     createdAt: Date | null
+    updatedAt: Date | null
   }
 
   export type UserCountAggregateOutputType = {
@@ -982,6 +984,7 @@ export namespace Prisma {
     isAdmin: number
     isActive: number
     createdAt: number
+    updatedAt: number
     _all: number
   }
 
@@ -994,6 +997,7 @@ export namespace Prisma {
     isAdmin?: true
     isActive?: true
     createdAt?: true
+    updatedAt?: true
   }
 
   export type UserMaxAggregateInputType = {
@@ -1004,6 +1008,7 @@ export namespace Prisma {
     isAdmin?: true
     isActive?: true
     createdAt?: true
+    updatedAt?: true
   }
 
   export type UserCountAggregateInputType = {
@@ -1014,6 +1019,7 @@ export namespace Prisma {
     isAdmin?: true
     isActive?: true
     createdAt?: true
+    updatedAt?: true
     _all?: true
   }
 
@@ -1097,6 +1103,7 @@ export namespace Prisma {
     isAdmin: boolean
     isActive: boolean
     createdAt: Date
+    updatedAt: Date
     _count: UserCountAggregateOutputType | null
     _min: UserMinAggregateOutputType | null
     _max: UserMaxAggregateOutputType | null
@@ -1124,6 +1131,7 @@ export namespace Prisma {
     isAdmin?: boolean
     isActive?: boolean
     createdAt?: boolean
+    updatedAt?: boolean
     auths?: boolean | User$authsArgs<ExtArgs>
     _count?: boolean | UserCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["user"]>
@@ -1138,9 +1146,10 @@ export namespace Prisma {
     isAdmin?: boolean
     isActive?: boolean
     createdAt?: boolean
+    updatedAt?: boolean
   }
 
-  export type UserOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "email" | "displayName" | "password" | "isAdmin" | "isActive" | "createdAt", ExtArgs["result"]["user"]>
+  export type UserOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "email" | "displayName" | "password" | "isAdmin" | "isActive" | "createdAt" | "updatedAt", ExtArgs["result"]["user"]>
   export type UserInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     auths?: boolean | User$authsArgs<ExtArgs>
     _count?: boolean | UserCountOutputTypeDefaultArgs<ExtArgs>
@@ -1159,6 +1168,7 @@ export namespace Prisma {
       isAdmin: boolean
       isActive: boolean
       createdAt: Date
+      updatedAt: Date
     }, ExtArgs["result"]["user"]>
     composites: {}
   }
@@ -1559,6 +1569,7 @@ export namespace Prisma {
     readonly isAdmin: FieldRef<"User", 'Boolean'>
     readonly isActive: FieldRef<"User", 'Boolean'>
     readonly createdAt: FieldRef<"User", 'DateTime'>
+    readonly updatedAt: FieldRef<"User", 'DateTime'>
   }
     
 
@@ -1990,6 +2001,7 @@ export namespace Prisma {
     expiresAt: Date | null
     token: string | null
     createdAt: Date | null
+    updatedAt: Date | null
   }
 
   export type AuthMaxAggregateOutputType = {
@@ -2001,6 +2013,7 @@ export namespace Prisma {
     expiresAt: Date | null
     token: string | null
     createdAt: Date | null
+    updatedAt: Date | null
   }
 
   export type AuthCountAggregateOutputType = {
@@ -2012,6 +2025,7 @@ export namespace Prisma {
     expiresAt: number
     token: number
     createdAt: number
+    updatedAt: number
     _all: number
   }
 
@@ -2025,6 +2039,7 @@ export namespace Prisma {
     expiresAt?: true
     token?: true
     createdAt?: true
+    updatedAt?: true
   }
 
   export type AuthMaxAggregateInputType = {
@@ -2036,6 +2051,7 @@ export namespace Prisma {
     expiresAt?: true
     token?: true
     createdAt?: true
+    updatedAt?: true
   }
 
   export type AuthCountAggregateInputType = {
@@ -2047,6 +2063,7 @@ export namespace Prisma {
     expiresAt?: true
     token?: true
     createdAt?: true
+    updatedAt?: true
     _all?: true
   }
 
@@ -2131,6 +2148,7 @@ export namespace Prisma {
     expiresAt: Date
     token: string
     createdAt: Date
+    updatedAt: Date
     _count: AuthCountAggregateOutputType | null
     _min: AuthMinAggregateOutputType | null
     _max: AuthMaxAggregateOutputType | null
@@ -2159,6 +2177,7 @@ export namespace Prisma {
     expiresAt?: boolean
     token?: boolean
     createdAt?: boolean
+    updatedAt?: boolean
     user?: boolean | UserDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["auth"]>
 
@@ -2173,9 +2192,10 @@ export namespace Prisma {
     expiresAt?: boolean
     token?: boolean
     createdAt?: boolean
+    updatedAt?: boolean
   }
 
-  export type AuthOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userId" | "otp" | "isVerified" | "isUsed" | "expiresAt" | "token" | "createdAt", ExtArgs["result"]["auth"]>
+  export type AuthOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userId" | "otp" | "isVerified" | "isUsed" | "expiresAt" | "token" | "createdAt" | "updatedAt", ExtArgs["result"]["auth"]>
   export type AuthInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     user?: boolean | UserDefaultArgs<ExtArgs>
   }
@@ -2194,6 +2214,7 @@ export namespace Prisma {
       expiresAt: Date
       token: string
       createdAt: Date
+      updatedAt: Date
     }, ExtArgs["result"]["auth"]>
     composites: {}
   }
@@ -2595,6 +2616,7 @@ export namespace Prisma {
     readonly expiresAt: FieldRef<"Auth", 'DateTime'>
     readonly token: FieldRef<"Auth", 'String'>
     readonly createdAt: FieldRef<"Auth", 'DateTime'>
+    readonly updatedAt: FieldRef<"Auth", 'DateTime'>
   }
     
 
@@ -2994,7 +3016,8 @@ export namespace Prisma {
     password: 'password',
     isAdmin: 'isAdmin',
     isActive: 'isActive',
-    createdAt: 'createdAt'
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
   };
 
   export type UserScalarFieldEnum = (typeof UserScalarFieldEnum)[keyof typeof UserScalarFieldEnum]
@@ -3008,7 +3031,8 @@ export namespace Prisma {
     isUsed: 'isUsed',
     expiresAt: 'expiresAt',
     token: 'token',
-    createdAt: 'createdAt'
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
   };
 
   export type AuthScalarFieldEnum = (typeof AuthScalarFieldEnum)[keyof typeof AuthScalarFieldEnum]
@@ -3098,6 +3122,7 @@ export namespace Prisma {
     isAdmin?: BoolFilter<"User"> | boolean
     isActive?: BoolFilter<"User"> | boolean
     createdAt?: DateTimeFilter<"User"> | Date | string
+    updatedAt?: DateTimeFilter<"User"> | Date | string
     auths?: AuthListRelationFilter
   }
 
@@ -3109,6 +3134,7 @@ export namespace Prisma {
     isAdmin?: SortOrder
     isActive?: SortOrder
     createdAt?: SortOrder
+    updatedAt?: SortOrder
     auths?: AuthOrderByRelationAggregateInput
   }
 
@@ -3123,6 +3149,7 @@ export namespace Prisma {
     isAdmin?: BoolFilter<"User"> | boolean
     isActive?: BoolFilter<"User"> | boolean
     createdAt?: DateTimeFilter<"User"> | Date | string
+    updatedAt?: DateTimeFilter<"User"> | Date | string
     auths?: AuthListRelationFilter
   }, "id" | "email">
 
@@ -3134,6 +3161,7 @@ export namespace Prisma {
     isAdmin?: SortOrder
     isActive?: SortOrder
     createdAt?: SortOrder
+    updatedAt?: SortOrder
     _count?: UserCountOrderByAggregateInput
     _max?: UserMaxOrderByAggregateInput
     _min?: UserMinOrderByAggregateInput
@@ -3150,6 +3178,7 @@ export namespace Prisma {
     isAdmin?: BoolWithAggregatesFilter<"User"> | boolean
     isActive?: BoolWithAggregatesFilter<"User"> | boolean
     createdAt?: DateTimeWithAggregatesFilter<"User"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"User"> | Date | string
   }
 
   export type AuthWhereInput = {
@@ -3164,6 +3193,7 @@ export namespace Prisma {
     expiresAt?: DateTimeFilter<"Auth"> | Date | string
     token?: StringFilter<"Auth"> | string
     createdAt?: DateTimeFilter<"Auth"> | Date | string
+    updatedAt?: DateTimeFilter<"Auth"> | Date | string
     user?: XOR<UserScalarRelationFilter, UserWhereInput>
   }
 
@@ -3176,6 +3206,7 @@ export namespace Prisma {
     expiresAt?: SortOrder
     token?: SortOrder
     createdAt?: SortOrder
+    updatedAt?: SortOrder
     user?: UserOrderByWithRelationInput
   }
 
@@ -3191,6 +3222,7 @@ export namespace Prisma {
     expiresAt?: DateTimeFilter<"Auth"> | Date | string
     token?: StringFilter<"Auth"> | string
     createdAt?: DateTimeFilter<"Auth"> | Date | string
+    updatedAt?: DateTimeFilter<"Auth"> | Date | string
     user?: XOR<UserScalarRelationFilter, UserWhereInput>
   }, "id">
 
@@ -3203,6 +3235,7 @@ export namespace Prisma {
     expiresAt?: SortOrder
     token?: SortOrder
     createdAt?: SortOrder
+    updatedAt?: SortOrder
     _count?: AuthCountOrderByAggregateInput
     _max?: AuthMaxOrderByAggregateInput
     _min?: AuthMinOrderByAggregateInput
@@ -3220,6 +3253,7 @@ export namespace Prisma {
     expiresAt?: DateTimeWithAggregatesFilter<"Auth"> | Date | string
     token?: StringWithAggregatesFilter<"Auth"> | string
     createdAt?: DateTimeWithAggregatesFilter<"Auth"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"Auth"> | Date | string
   }
 
   export type UserCreateInput = {
@@ -3230,6 +3264,7 @@ export namespace Prisma {
     isAdmin?: boolean
     isActive?: boolean
     createdAt?: Date | string
+    updatedAt?: Date | string
     auths?: AuthCreateNestedManyWithoutUserInput
   }
 
@@ -3241,6 +3276,7 @@ export namespace Prisma {
     isAdmin?: boolean
     isActive?: boolean
     createdAt?: Date | string
+    updatedAt?: Date | string
     auths?: AuthUncheckedCreateNestedManyWithoutUserInput
   }
 
@@ -3251,6 +3287,7 @@ export namespace Prisma {
     isAdmin?: BoolFieldUpdateOperationsInput | boolean
     isActive?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     auths?: AuthUpdateManyWithoutUserNestedInput
   }
 
@@ -3261,6 +3298,7 @@ export namespace Prisma {
     isAdmin?: BoolFieldUpdateOperationsInput | boolean
     isActive?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     auths?: AuthUncheckedUpdateManyWithoutUserNestedInput
   }
 
@@ -3272,6 +3310,7 @@ export namespace Prisma {
     isAdmin?: boolean
     isActive?: boolean
     createdAt?: Date | string
+    updatedAt?: Date | string
   }
 
   export type UserUpdateManyMutationInput = {
@@ -3281,6 +3320,7 @@ export namespace Prisma {
     isAdmin?: BoolFieldUpdateOperationsInput | boolean
     isActive?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type UserUncheckedUpdateManyInput = {
@@ -3290,6 +3330,7 @@ export namespace Prisma {
     isAdmin?: BoolFieldUpdateOperationsInput | boolean
     isActive?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type AuthCreateInput = {
@@ -3300,6 +3341,7 @@ export namespace Prisma {
     expiresAt: Date | string
     token: string
     createdAt?: Date | string
+    updatedAt?: Date | string
     user: UserCreateNestedOneWithoutAuthsInput
   }
 
@@ -3312,6 +3354,7 @@ export namespace Prisma {
     expiresAt: Date | string
     token: string
     createdAt?: Date | string
+    updatedAt?: Date | string
   }
 
   export type AuthUpdateInput = {
@@ -3321,6 +3364,7 @@ export namespace Prisma {
     expiresAt?: DateTimeFieldUpdateOperationsInput | Date | string
     token?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     user?: UserUpdateOneRequiredWithoutAuthsNestedInput
   }
 
@@ -3332,6 +3376,7 @@ export namespace Prisma {
     expiresAt?: DateTimeFieldUpdateOperationsInput | Date | string
     token?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type AuthCreateManyInput = {
@@ -3343,6 +3388,7 @@ export namespace Prisma {
     expiresAt: Date | string
     token: string
     createdAt?: Date | string
+    updatedAt?: Date | string
   }
 
   export type AuthUpdateManyMutationInput = {
@@ -3352,6 +3398,7 @@ export namespace Prisma {
     expiresAt?: DateTimeFieldUpdateOperationsInput | Date | string
     token?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type AuthUncheckedUpdateManyInput = {
@@ -3362,6 +3409,7 @@ export namespace Prisma {
     expiresAt?: DateTimeFieldUpdateOperationsInput | Date | string
     token?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type StringFilter<$PrismaModel = never> = {
@@ -3413,6 +3461,7 @@ export namespace Prisma {
     isAdmin?: SortOrder
     isActive?: SortOrder
     createdAt?: SortOrder
+    updatedAt?: SortOrder
   }
 
   export type UserMaxOrderByAggregateInput = {
@@ -3423,6 +3472,7 @@ export namespace Prisma {
     isAdmin?: SortOrder
     isActive?: SortOrder
     createdAt?: SortOrder
+    updatedAt?: SortOrder
   }
 
   export type UserMinOrderByAggregateInput = {
@@ -3433,6 +3483,7 @@ export namespace Prisma {
     isAdmin?: SortOrder
     isActive?: SortOrder
     createdAt?: SortOrder
+    updatedAt?: SortOrder
   }
 
   export type StringWithAggregatesFilter<$PrismaModel = never> = {
@@ -3489,6 +3540,7 @@ export namespace Prisma {
     expiresAt?: SortOrder
     token?: SortOrder
     createdAt?: SortOrder
+    updatedAt?: SortOrder
   }
 
   export type AuthMaxOrderByAggregateInput = {
@@ -3500,6 +3552,7 @@ export namespace Prisma {
     expiresAt?: SortOrder
     token?: SortOrder
     createdAt?: SortOrder
+    updatedAt?: SortOrder
   }
 
   export type AuthMinOrderByAggregateInput = {
@@ -3511,6 +3564,7 @@ export namespace Prisma {
     expiresAt?: SortOrder
     token?: SortOrder
     createdAt?: SortOrder
+    updatedAt?: SortOrder
   }
 
   export type AuthCreateNestedManyWithoutUserInput = {
@@ -3669,6 +3723,7 @@ export namespace Prisma {
     expiresAt: Date | string
     token: string
     createdAt?: Date | string
+    updatedAt?: Date | string
   }
 
   export type AuthUncheckedCreateWithoutUserInput = {
@@ -3679,6 +3734,7 @@ export namespace Prisma {
     expiresAt: Date | string
     token: string
     createdAt?: Date | string
+    updatedAt?: Date | string
   }
 
   export type AuthCreateOrConnectWithoutUserInput = {
@@ -3718,6 +3774,7 @@ export namespace Prisma {
     expiresAt?: DateTimeFilter<"Auth"> | Date | string
     token?: StringFilter<"Auth"> | string
     createdAt?: DateTimeFilter<"Auth"> | Date | string
+    updatedAt?: DateTimeFilter<"Auth"> | Date | string
   }
 
   export type UserCreateWithoutAuthsInput = {
@@ -3728,6 +3785,7 @@ export namespace Prisma {
     isAdmin?: boolean
     isActive?: boolean
     createdAt?: Date | string
+    updatedAt?: Date | string
   }
 
   export type UserUncheckedCreateWithoutAuthsInput = {
@@ -3738,6 +3796,7 @@ export namespace Prisma {
     isAdmin?: boolean
     isActive?: boolean
     createdAt?: Date | string
+    updatedAt?: Date | string
   }
 
   export type UserCreateOrConnectWithoutAuthsInput = {
@@ -3763,6 +3822,7 @@ export namespace Prisma {
     isAdmin?: BoolFieldUpdateOperationsInput | boolean
     isActive?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type UserUncheckedUpdateWithoutAuthsInput = {
@@ -3772,6 +3832,7 @@ export namespace Prisma {
     isAdmin?: BoolFieldUpdateOperationsInput | boolean
     isActive?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type AuthCreateManyUserInput = {
@@ -3782,6 +3843,7 @@ export namespace Prisma {
     expiresAt: Date | string
     token: string
     createdAt?: Date | string
+    updatedAt?: Date | string
   }
 
   export type AuthUpdateWithoutUserInput = {
@@ -3791,6 +3853,7 @@ export namespace Prisma {
     expiresAt?: DateTimeFieldUpdateOperationsInput | Date | string
     token?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type AuthUncheckedUpdateWithoutUserInput = {
@@ -3800,6 +3863,7 @@ export namespace Prisma {
     expiresAt?: DateTimeFieldUpdateOperationsInput | Date | string
     token?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type AuthUncheckedUpdateManyWithoutUserInput = {
@@ -3809,6 +3873,7 @@ export namespace Prisma {
     expiresAt?: DateTimeFieldUpdateOperationsInput | Date | string
     token?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
 

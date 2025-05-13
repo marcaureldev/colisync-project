@@ -120,7 +120,8 @@ exports.Prisma.UserScalarFieldEnum = {
   password: 'password',
   isAdmin: 'isAdmin',
   isActive: 'isActive',
-  createdAt: 'createdAt'
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
 };
 
 exports.Prisma.AuthScalarFieldEnum = {
@@ -131,7 +132,8 @@ exports.Prisma.AuthScalarFieldEnum = {
   isUsed: 'isUsed',
   expiresAt: 'expiresAt',
   token: 'token',
-  createdAt: 'createdAt'
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
 };
 
 exports.Prisma.SortOrder = {
