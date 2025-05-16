@@ -18,9 +18,11 @@ import { Input } from "@/components/ui/input";
 import React from "react";
 import { useRouter } from "next/navigation";
 import { NextResponse } from "next/server";
+import { ClipLoader } from "react-spinners";
 
 const Register = () => {
   const [error, setError] = React.useState<string | null>(null);
+  const [isLoading, setIsLoading] = React.useState(false);
   const router = useRouter();
   const domain = process.env.NEXT_PUBLIC_SITE_URL;
 
@@ -58,6 +60,7 @@ const Register = () => {
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     try {
+      setIsLoading(true);
       const response = await fetch("/api/auth/register", {
         method: "POST",
         body: JSON.stringify(values),
@@ -65,11 +68,11 @@ const Register = () => {
 
       const data = await response.json();
 
+      console.log(data);
+
       if (response.ok) {
         form.reset();
-        router.push(
-          `/auth/verifyEmail?email=${encodeURIComponent(values.email)}`
-        );
+        router.push(data.redirectLink);
       } else {
         setError(
           data.error || "Une erreur est survenue lors de l'inscription."
@@ -177,8 +180,21 @@ const Register = () => {
               <Button
                 type="submit"
                 className="w-full mt-6 bg-blue-500 hover:bg-blue-600"
+                disabled={isLoading}
               >
-                S'inscrire
+                {isLoading ? (
+                    <div className="py-2">
+                      <ClipLoader
+                        color={"#ffffff"}
+                        loading={isLoading}
+                        size={18}
+                        aria-label="Chargement"
+                      />
+                    </div>
+                  ) : (
+                    <span className="text-white py-2">S'inscrire</span>
+                  )}
+                
               </Button>
             </form>
           </Form>

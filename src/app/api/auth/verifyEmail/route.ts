@@ -1,18 +1,61 @@
 import { prisma } from "@/lib/db";
 import { NextResponse } from "next/server";
+import jwt from "jsonwebtoken";
+import { cookies } from "next/headers";
+
+const generateToken = (user: { id: string; email: string }) => {
+  const secret = process.env.JWT_SECRET_KEY;
+  if (!secret) {
+    throw new Error("JWT secret key is not defined");
+  }
+  return jwt.sign({ id: user.id, email: user.email }, secret, {
+    expiresIn: "30d",
+  });
+};
 
 export async function POST(request: Request) {
   try {
     const now = new Date();
-    const { email, token, otp } = await request.json();
+    const { token, otp } = await request.json();
+
+    const auth = await prisma.auth.findFirst({
+      where: {
+        token,
+      },
+    });
+
+    if (!auth) {
+      return NextResponse.json(
+        { error: "Code OTP invalide ou expiré" },
+        { status: 404 }
+      );
+    }
+    if (auth.expiresAt < now) {
+      return NextResponse.json(
+        { error: "Code OTP invalide ou  expiré" },
+        { status: 400 }
+      );
+    }
+
+    if (auth.otp !== otp) {
+      return NextResponse.json(
+        { error: "Code OTP invalide ou expiré" },
+        { status: 400 }
+      );
+    }
+    await prisma.user.update({
+      where: { id: auth.userId },
+      data: {
+        isActive: true,
+      },
+    });
+
+    await prisma.auth.delete({
+      where: { id: auth.id },
+    });
 
     const user = await prisma.user.findUnique({
-      where: {
-        email,
-      },
-      include: {
-        auths: true,
-      },
+      where: { id: auth.userId },
     });
 
     if (!user) {
@@ -22,42 +65,21 @@ export async function POST(request: Request) {
       );
     }
 
-    const validOTP = user.auths.find((auth) => {
-      return (
-        auth.otp === otp &&
-        auth.token === token &&
-        auth.expiresAt > now &&
-        !auth.isUsed &&
-        !auth.isVerified
-      );
-    });
+    const access_token = generateToken({ id: user.id, email: user.email });
 
-    if (!validOTP) {
-      return NextResponse.json(
-        { error: "Code OTP invalide ou expiré", success: false },
-        { status: 400 }
-      );
-    }
+    const cookieStore = await cookies();
 
-    await prisma.auth.update({
-      where: { id: validOTP.id },
-      data: {
-        isVerified: true,
-        isUsed: true,
-      },
-    });
-
-    await prisma.user.update( {
-        where: { id: user.id},
-        data: {
-            isActive: true,
-        }
+    cookieStore.set({
+      name: "access_token",
+      value: access_token,
+      httpOnly: true,
+      path: "/",
     });
 
     return NextResponse.json(
-        {success: true, message: "Email vérifié avec succès"},
-        { status: 200 }
-    )
+      { success: true, message: "Email vérifié avec succès" },
+      { status: 200 }
+    );
   } catch (error) {
     return NextResponse.json(
       { error: "Une erreur est survenue" },
