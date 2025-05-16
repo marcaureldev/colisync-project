@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/input-otp";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
+import { BeatLoader, ClipLoader } from "react-spinners";
 
 const FormSchema = z.object({
   otp: z.string().min(6, {
@@ -25,10 +26,8 @@ const VerifyEmail = () => {
   const searchParams = useSearchParams();
   const email = searchParams.get("email");
   const token = searchParams.get("token");
-  const otp = searchParams.get(
-    "otp<Form {...form} onSubmit={form.handleSubmit(onSubmit)}>"
-  );
-
+  const existingOTP = searchParams.has("otp");
+  const otp = existingOTP ? searchParams.get("otp") : null;
   const autoVerify = searchParams.get("autoVerify") === "true";
 
   const [timeLeft, setTimeLeft] = useState(60);
@@ -56,7 +55,6 @@ const VerifyEmail = () => {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          email,
           token,
           otp: otpCode,
         }),
@@ -83,13 +81,13 @@ const VerifyEmail = () => {
     }
   };
 
-  function onSubmit(data: z.infer<typeof FormSchema>) {
-    console.log("Bonjour")
-    // await verifyOtpCode(data.otp);
+  async function onSubmit(data: z.infer<typeof FormSchema>) {
+    await verifyOtpCode(data.otp);
   }
 
+  // Vérification automatique si le code OTP est présent dans l'URL
   useEffect(() => {
-    if (autoVerify && otp && token && email && !isVerifying) {
+    if (autoVerify && otp && token && !isVerifying) {
       setIsVerifying(true);
       // Pré-remplir le formulaire OTP si on a le code dans l'URL
       form.setValue("otp", otp);
@@ -102,7 +100,7 @@ const VerifyEmail = () => {
         }
       });
     }
-  }, [autoVerify, otp, token, email]);
+  }, [autoVerify, otp, token]);
 
   useEffect(() => {
     if (!isTimerRunning) return;
@@ -115,103 +113,35 @@ const VerifyEmail = () => {
     }
   }, [timeLeft, isTimerRunning]);
 
-  const handleResendCode = () => {
-    // Ici vous pouvez implémenter la logique pour renvoyer un code
-    setTimeLeft(60);
-    setIsTimerRunning(true);
-  };
+  // const handleResendCode = async () => {
+  //   // Ici vous pouvez implémenter la logique pour renvoyer un code
+  //   const otpCode = generateNumericOTP(6);
+  //   const response = await fetch("/api/auth/resendOtpCode", {
+  //     method: "POST",
+  //     headers: {
+  //       "Content-Type": "application/json",
+  //     },
+  //     body: JSON.stringify({
+  //       email,
+  //       token,
+  //       otp: otpCode,
+  //     }),
+  //   });
+
+  //   const data = await response.json();
+  //   if (response.ok) {
+  //     setSuccess("Un nouveau code a été envoyé à votre adresse e-mail.");
+  //     setIsTimerRunning(true);
+  //     setTimeLeft(60);
+  //   } else {
+  //     setError(data.error || "Une erreur est survenue lors du renvoi du code.");
+  //   }
+
+  //   setTimeLeft(60);
+  //   setIsTimerRunning(true);
+  // };
 
   return (
-    // <div className="flex flex-col items-center justify-center h-screen bg-gradient-to-r from-[#0F123B] via-[#090D2E] to-[rgb(2,5,21)] text-white">
-    //   <div className="p-8 w-full max-w-md border rounded-lg shadow-lg bg-white/5 backdrop-blur-lg border-white/10">
-    //     <div className="text-center mb-6">
-    //       <h2 className="text-2xl font-bold">Vérifiez votre email</h2>
-    //       <p className="mt-2">
-    //         Nous avons envoyé un code à 6 chiffres à l'adresse {email}
-    //       </p>
-    //     </div>
-
-    //     <div className="mb-8 flex flex-col items-center">
-    //       <Form {...form}>
-    // <FormField
-    //   control={form.control}
-    //   name="otp"
-    //   render={({ field }) => (
-    //     <FormItem>
-    //       <FormControl>
-    //         <InputOTP
-    //           maxLength={6}
-    //           pattern={REGEXP_ONLY_DIGITS_AND_CHARS}
-    //           className="gap-3 justify-center"
-    //         >
-    //           <InputOTPGroup>
-    //             <InputOTPSlot
-    //               index={0}
-    //               className="w-12 h-12 mr-2 border-2 rounded-md border-gray-300"
-    //             />
-    //             <InputOTPSlot
-    //               index={1}
-    //               className="w-12 h-12 mr-2 border-2 rounded-md border-gray-300"
-    //             />
-    //             <InputOTPSlot
-    //               index={2}
-    //               className="w-12 h-12 mr-2 border-2 rounded-md border-gray-300"
-    //             />
-    //             <InputOTPSlot
-    //               index={3}
-    //               className="w-12 h-12 mr-2 border-2 rounded-md border-gray-300"
-    //             />
-    //             <InputOTPSlot
-    //               index={4}
-    //               className="w-12 h-12 mr-2 border-2 rounded-md border-gray-300"
-    //             />
-    //             <InputOTPSlot
-    //               index={5}
-    //               className="w-12 h-12 border-2 rounded-md border-gray-300"
-    //             />
-    //           </InputOTPGroup>
-    //         </InputOTP>
-    //       </FormControl>
-    //     </FormItem>
-    //   )}
-    // />
-
-    //         {error && (
-    //           <div className="p-2 bg-red-100 text-red-700 rounded">{error}</div>
-    //         )}
-
-    //         {success && (
-    //           <div className="p-2 bg-green-100 text-green-700 rounded">
-    //             {success}
-    //           </div>
-    //         )}
-    //         <Button
-    //           type="submit"
-    //           className="w-full mt-6 bg-blue-500 hover:bg-blue-600"
-    //         >
-    //           Vérifier
-    //         </Button>
-    //       </Form>
-    //     </div>
-
-    //     <div className="mt-6 text-center">
-    //       <p className="text-gray-600">
-    //         Vous n'avez pas reçu de code?{" "}
-    //         {timeLeft > 0 ? (
-    //           <span className="text-gray-500">Renvoyer dans {timeLeft}s</span>
-    //         ) : (
-    //           <button
-    //             onClick={handleResendCode}
-    //             className="text-blue-600 font-medium hover:underline"
-    //           >
-    //             Renvoyer le code
-    //           </button>
-    //         )}
-    //       </p>
-    //     </div>
-    //   </div>
-    // </div>
-
     <div className="flex flex-col items-center justify-center h-screen bg-gradient-to-r from-[#0F123B] via-[#090D2E] to-[rgb(2,5,21)] text-white">
       <div className="p-8 w-full max-w-md border rounded-lg shadow-lg bg-white/5 backdrop-blur-lg border-white/10">
         <div className="text-center mb-6">
@@ -225,45 +155,43 @@ const VerifyEmail = () => {
           )}
         </div>
 
-        {/* Afficher le formulaire uniquement si on n'est pas en mode vérification auto
-            ou si la vérification auto a échoué */}
+        {/* Afficher le formulaire uniquement si on n'est pas en mode vérification auto ou si la vérification auto a échoué */}
         {(!autoVerify || (autoVerify && !isVerifying)) && (
           <div className="mb-8 flex flex-col items-center">
             <Form {...form}>
-              <form
-                onSubmit={form.handleSubmit(onSubmit)}
-              >
+              <form onSubmit={form.handleSubmit(onSubmit)} className="w-full">
                 <FormField
                   control={form.control}
                   name="otp"
                   render={({ field }) => (
-                    <FormItem>
+                    <FormItem className="flex flex-col items-center w-full">
                       <FormControl>
                         <InputOTP
                           maxLength={6}
                           pattern={REGEXP_ONLY_DIGITS_AND_CHARS}
-                          className="gap-3 justify-center"
+                          className="flex justify-center"
+                          {...field}
                         >
-                          <InputOTPGroup>
+                          <InputOTPGroup className="flex justify-center gap-2">
                             <InputOTPSlot
                               index={0}
-                              className="w-12 h-12 mr-2 border-2 rounded-md border-gray-300"
+                              className="w-12 h-12 border-2 rounded-md border-gray-300"
                             />
                             <InputOTPSlot
                               index={1}
-                              className="w-12 h-12 mr-2 border-2 rounded-md border-gray-300"
+                              className="w-12 h-12 border-2 rounded-md border-gray-300"
                             />
                             <InputOTPSlot
                               index={2}
-                              className="w-12 h-12 mr-2 border-2 rounded-md border-gray-300"
+                              className="w-12 h-12 border-2 rounded-md border-gray-300"
                             />
                             <InputOTPSlot
                               index={3}
-                              className="w-12 h-12 mr-2 border-2 rounded-md border-gray-300"
+                              className="w-12 h-12 border-2 rounded-md border-gray-300"
                             />
                             <InputOTPSlot
                               index={4}
-                              className="w-12 h-12 mr-2 border-2 rounded-md border-gray-300"
+                              className="w-12 h-12 border-2 rounded-md border-gray-300"
                             />
                             <InputOTPSlot
                               index={5}
@@ -289,10 +217,21 @@ const VerifyEmail = () => {
 
                 <Button
                   type="submit"
-                  className="w-full mt-6 bg-blue-500 hover:bg-blue-600"
+                  className="w-full mt-6 bg-blue-500 hover:bg-blue-600 relative flex items-center justify-center"
                   disabled={isLoading}
                 >
-                  {isLoading ? "Vérification..." : "Vérifier"}
+                  {isLoading ? (
+                    <div className="py-2">
+                      <ClipLoader
+                        color={"#ffffff"}
+                        loading={isLoading}
+                        size={18}
+                        aria-label="Chargement"
+                      />
+                    </div>
+                  ) : (
+                    <span className="text-white py-2">Vérifier</span>
+                  )}
                 </Button>
               </form>
             </Form>
@@ -303,9 +242,17 @@ const VerifyEmail = () => {
         {autoVerify && isVerifying && (
           <div className="my-6 text-center">
             {isLoading && (
-              <div className="flex justify-center">
-                {/* Ici vous pouvez ajouter un spinner/loader */}
-                <p>Vérification en cours...</p>
+              <div className="flex flex-col items-center justify-center space-y-2">
+                <BeatLoader
+                  color={"#3B82F6"}
+                  loading={isLoading}
+                  size={10}
+                  margin={4}
+                  speedMultiplier={1}
+                />
+                <p className="text-blue-500 font-medium text-sm">
+                  Vérification en cours...
+                </p>
               </div>
             )}
 
@@ -321,16 +268,29 @@ const VerifyEmail = () => {
             {success && (
               <div className="p-3 bg-green-100 text-green-700 rounded mt-4">
                 {success}
-                <p className="mt-2 text-sm">
+                {/* <p className="mt-2 text-sm">
                   Redirection vers le tableau de bord...
-                </p>
+                </p> */}
               </div>
             )}
           </div>
         )}
 
-        {/* Section pour renvoyer le code reste identique */}
-        <div className="mt-6 text-center">{/* ... */}</div>
+        {/* Section pour renvoyer le code */}
+        <div className="mt-6 text-center">
+          <p className="text-gray-300">
+            Vous n'avez pas reçu de code?{" "}
+            {timeLeft > 0 ? (
+              <span className="text-gray-400">Renvoyer dans {timeLeft}s</span>
+            ) : (
+              <button
+                className="text-blue-400 font-medium hover:underline"
+              >
+                Renvoyer le code
+              </button>
+            )}
+          </p>
+        </div>
       </div>
     </div>
   );

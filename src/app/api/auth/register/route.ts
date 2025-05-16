@@ -46,26 +46,16 @@ export async function POST(request: Request) {
     });
 
     const verificationLink = `${domain}/auth/verifyEmail?token=${auth.token}&email=${user.email}`;
+    const redirectLink = `/auth/verifyEmail?token=${auth.token}&email=${user.email}`
 
-    // Envoi de l'email avec le lien et l'OTP
-    try {
-      await sendVerificationEmail(user, verificationLink, auth.otp);
-    } catch (emailError) {
-      console.error("Erreur lors de l'envoi de l'email:", emailError);
-      // On continue même si l'email échoue, l'utilisateur pourra demander un renvoi
-    }
 
-    // const redirectLink = `${domain}/auth/verifyEmail?token=${auth.token}&email=${user.email}&userId=${user.id}`;
-    // // await sendVerificationEmail(user, redirectLink, auth.otp);
-    // // const { password: _, ...userWithoutPassword } = user;
-    // return NextResponse.json({ redirectUrl: redirectLink });
+      await sendVerificationEmail(user, verificationLink, auth.otp, "initial");
 
     return NextResponse.json(
       {
         success: true,
         message: "Compte créé avec succès. Veuillez vérifier votre email.",
-        email: user.email,
-        // Pas besoin d'envoyer l'OTP dans la réponse car il est envoyé par email
+        redirectLink,
       },
       { status: 201 }
     );
