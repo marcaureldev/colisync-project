@@ -38,8 +38,6 @@ export async function POST(request: Request) {
       data: {
         userId: user.id,
         otp: generateNumericOTP(6),
-        isVerified: false,
-        isUsed: false,
         expiresAt: new Date(Date.now() + 1000 * 60 * 10),
         token: generateToken(32),
       },

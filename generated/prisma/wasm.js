@@ -128,8 +128,6 @@ exports.Prisma.AuthScalarFieldEnum = {
   id: 'id',
   userId: 'userId',
   otp: 'otp',
-  isVerified: 'isVerified',
-  isUsed: 'isUsed',
   expiresAt: 'expiresAt',
   token: 'token',
   createdAt: 'createdAt',
