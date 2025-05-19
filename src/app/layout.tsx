@@ -1,33 +1,17 @@
 import type { Metadata } from "next";
-import { Roboto } from "next/font/google"
-// import { Geist, Geist_Mono } from "next/font/google";
-import { Inter } from "next/font/google";
+import { Roboto } from "next/font/google";
 import "./globals.css";
+import { ThemeProvider } from "@/contexts/ThemeContext"; // Importer ThemeProvider
 
 const roboto = Roboto({
-  weight: ["300", "400", "500", "700"], // Choisissez les graisses dont vous avez besoin
+  weight: ["300", "400", "500", "700"],
   subsets: ["latin"],
-  display: "swap", // Améliore la performance de chargement de la police
+  display: "swap",
 });
-
-const inter = Inter({
-  subsets: ["latin"],
-  variable: "--font-inter",
-});
-
-// const geistSans = Geist({
-//   variable: "--font-geist-sans",
-//   subsets: ["latin"],
-// });
-
-// const geistMono = Geist_Mono({
-//   variable: "--font-geist-mono",
-//   subsets: ["latin"],
-// });
 
 export const metadata: Metadata = {
-  title: "ColiSync", 
-  description: "Votre application de suivi de colis",  
+  title: "ColiSync",
+  description: "Votre application de suivi de colis",
 };
 
 export default function RootLayout({
@@ -36,11 +20,15 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body
-         className={inter.className}
-      >
-        {children}
+    <html lang="fr" className={roboto.className} suppressHydrationWarning>
+      {" "}
+      {/* suppressHydrationWarning est utile avec le thème */}
+      <body>
+        <ThemeProvider>
+          {" "}
+          {/* Envelopper avec ThemeProvider */}
+          {children}
+        </ThemeProvider>
       </body>
     </html>
   );
