@@ -22,7 +22,12 @@ export async function POST(request: Request) {
 
     if (existingUser) {
       return NextResponse.json(
-        { error: "Cet email est déjà utilisé", success: false },
+        {
+          error:
+            "Cette addresse email est déjà utilisée",
+          success: false,
+          field: "email",
+        },
         { status: 400 }
       );
     }
@@ -44,10 +49,9 @@ export async function POST(request: Request) {
     });
 
     const verificationLink = `${domain}/auth/verifyEmail?token=${auth.token}&email=${user.email}`;
-    const redirectLink = `/auth/verifyEmail?token=${auth.token}&email=${user.email}`
+    const redirectLink = `/auth/verifyEmail?token=${auth.token}&email=${user.email}`;
 
-
-      await sendVerificationEmail(user, verificationLink, auth.otp, "initial");
+    await sendVerificationEmail(user, verificationLink, auth.otp, "initial");
 
     return NextResponse.json(
       {
