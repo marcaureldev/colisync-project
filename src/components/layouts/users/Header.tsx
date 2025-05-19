@@ -1,6 +1,15 @@
 "use client";
 import React, { useState } from "react";
-import { Bell, Search, Menu, X, Settings, User, LogOut } from "lucide-react";
+import {
+  Bell,
+  Search,
+  Menu,
+  Settings,
+  User,
+  LogOut,
+  Sun,
+  Moon,
+} from "lucide-react"; // Importer Sun et Moon
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import {
@@ -14,12 +23,14 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
+import { useTheme } from "@/contexts/ThemeContext"; // Importer useTheme
 
 interface HeaderProps {
   toggleSidebar?: () => void;
 }
 
 const Header = ({ toggleSidebar }: HeaderProps) => {
+  const { theme, toggleTheme } = useTheme(); // Utiliser le contexte de thème
   const [notifications, setNotifications] = useState([
     {
       id: 1,
@@ -46,7 +57,7 @@ const Header = ({ toggleSidebar }: HeaderProps) => {
   };
 
   return (
-    <header className="border-b border-white/10 bg-white/5 backdrop-blur-lg p-4 flex items-center justify-between">
+    <header className="border-b bg-white/5 dark:border-white/10 dark:bg-white/5 backdrop-blur-lg p-4 flex items-center justify-between text-gray-800 dark:text-white">
       <div className="flex items-center gap-4">
         <Button
           variant="ghost"
@@ -66,15 +77,27 @@ const Header = ({ toggleSidebar }: HeaderProps) => {
         </div> */}
 
         <div>
-            <p>Bienvenue, @Username</p>
+          <p className="text-sm sm:text-base">Bienvenue, @Username</p>
         </div>
       </div>
 
-      <div className="flex items-center gap-4">
+      <div className="flex items-center gap-2 sm:gap-4">
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={toggleTheme}
+          aria-label="Changer de thème"
+        >
+          {theme === "light" ? (
+            <Moon className="size-5 text-slate-700" />
+          ) : (
+            <Sun className="size-5 text-yellow-400" />
+          )}
+        </Button>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" size="icon" className="relative">
-              <Bell className="size-5 text-gray-400" />
+              <Bell className="size-5 text-gray-500 dark:text-gray-400" />
               {unreadCount > 0 && (
                 <Badge
                   className="absolute -top-1 -right-1 px-1.5 h-5 min-w-5 flex items-center justify-center bg-blue-500 text-white"
@@ -87,12 +110,14 @@ const Header = ({ toggleSidebar }: HeaderProps) => {
           </DropdownMenuTrigger>
           <DropdownMenuContent
             align="end"
-            className="w-80 bg-[#0F123B] border-white/10 text-white"
+            className="w-80 bg-white dark:bg-[#0F123B] border dark:border-white/10 text-gray-800 dark:text-white shadow-lg"
           >
-            <DropdownMenuLabel>Notifications</DropdownMenuLabel>
-            <DropdownMenuSeparator />
+            <DropdownMenuLabel className="dark:text-white">
+              Notifications
+            </DropdownMenuLabel>
+            <DropdownMenuSeparator className="dark:bg-white/10" />
             {notifications.length === 0 ? (
-              <div className="py-4 text-center text-gray-400">
+              <div className="py-4 text-center text-gray-500 dark:text-gray-400">
                 Aucune notification
               </div>
             ) : (
@@ -101,32 +126,35 @@ const Header = ({ toggleSidebar }: HeaderProps) => {
                   key={notification.id}
                   className={cn(
                     "group flex flex-col items-start p-3 cursor-pointer transition-colors",
-                    !notification.read ? "bg-blue-500/10" : "", // Style pour les non-lus
-                    "hover:bg-blue-500/20 data-[highlighted]:bg-blue-500/20" // Style de survol/focus
+                    !notification.read ? "bg-blue-500/10" : "",
+                    "hover:bg-gray-100 dark:hover:bg-blue-500/20 data-[highlighted]:bg-gray-100 dark:data-[highlighted]:bg-blue-500/20"
                   )}
                   onClick={() => markAsRead(notification.id)}
                 >
                   <div className="flex justify-between w-full">
-                    <span className="font-medium text-white">
+                    <span className="font-medium text-gray-800 dark:text-white">
                       {notification.title}
                     </span>
-                    <span className="text-xs text-gray-400 group-hover:text-gray-200 group-data-[highlighted]:text-gray-200 transition-colors">
+                    <span className="text-xs text-gray-500 dark:text-gray-400 group-hover:text-gray-600 dark:group-hover:text-gray-200 group-data-[highlighted]:text-gray-600 dark:group-data-[highlighted]:text-gray-200 transition-colors">
                       {notification.time}
                     </span>
                   </div>
-                  <span className="text-sm text-gray-400 mt-1 group-hover:text-gray-200 group-data-[highlighted]:text-gray-200 transition-colors">
+                  <span className="text-sm text-gray-500 dark:text-gray-400 mt-1 group-hover:text-gray-600 dark:group-hover:text-gray-200 group-data-[highlighted]:text-gray-600 dark:group-data-[highlighted]:text-gray-200 transition-colors">
                     {notification.message}
                   </span>
                   {!notification.read && (
-                    <Badge className="mt-2 bg-blue-500" variant="default">
+                    <Badge
+                      className="mt-2 bg-blue-500 text-white"
+                      variant="default"
+                    >
                       Nouveau
                     </Badge>
                   )}
                 </DropdownMenuItem>
               ))
             )}
-            <DropdownMenuSeparator />
-            <DropdownMenuItem className="justify-center text-blue-400 hover:text-blue-300 data-[highlighted]:text-blue-300 hover:bg-blue-500/10 data-[highlighted]:bg-blue-500/10 transition-colors">
+            <DropdownMenuSeparator className="dark:bg-white/10" />
+            <DropdownMenuItem className="justify-center text-blue-500 dark:text-blue-400 hover:text-blue-600 dark:hover:text-blue-300 data-[highlighted]:text-blue-600 dark:data-[highlighted]:text-blue-300 hover:bg-gray-100 dark:hover:bg-blue-500/10 data-[highlighted]:bg-gray-100 dark:data-[highlighted]:bg-blue-500/10 transition-colors">
               Voir toutes les notifications
             </DropdownMenuItem>
           </DropdownMenuContent>
@@ -137,7 +165,7 @@ const Header = ({ toggleSidebar }: HeaderProps) => {
             <Button variant="ghost" className="relative h-10 w-10 rounded-full">
               <Avatar>
                 <AvatarImage src="/placeholder-user.jpg" />
-                <AvatarFallback className="bg-blue-500/20 text-blue-400">
+                <AvatarFallback className="bg-blue-100 dark:bg-blue-500/20 text-blue-600 dark:text-blue-400">
                   US
                 </AvatarFallback>
               </Avatar>
@@ -145,26 +173,28 @@ const Header = ({ toggleSidebar }: HeaderProps) => {
           </DropdownMenuTrigger>
           <DropdownMenuContent
             align="end"
-            className="w-56 bg-[#0F123B] border-white/10 text-white"
+            className="w-56 bg-white dark:bg-[#0F123B] border dark:border-white/10 text-gray-800 dark:text-white shadow-lg"
           >
-            <DropdownMenuLabel>Mon compte</DropdownMenuLabel>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem className="group hover:bg-blue-500/20 data-[highlighted]:bg-blue-500/20 transition-colors">
-              <User className="mr-2 size-4 text-gray-400 group-hover:text-blue-300 group-data-[highlighted]:text-blue-300 transition-colors" />
-              <span className="text-gray-300 group-hover:text-blue-300 group-data-[highlighted]:text-blue-300 transition-colors">
+            <DropdownMenuLabel className="dark:text-white">
+              Mon compte
+            </DropdownMenuLabel>
+            <DropdownMenuSeparator className="dark:bg-white/10" />
+            <DropdownMenuItem className="group hover:bg-gray-100 dark:hover:bg-blue-500/20 data-[highlighted]:bg-gray-100 dark:data-[highlighted]:bg-blue-500/20 transition-colors">
+              <User className="mr-2 size-4 text-gray-500 dark:text-gray-400 group-hover:text-blue-600 dark:group-hover:text-blue-300 group-data-[highlighted]:text-blue-600 dark:group-data-[highlighted]:text-blue-300 transition-colors" />
+              <span className="text-gray-700 dark:text-gray-300 group-hover:text-blue-600 dark:group-hover:text-blue-300 group-data-[highlighted]:text-blue-600 dark:group-data-[highlighted]:text-blue-300 transition-colors">
                 Profil
               </span>
             </DropdownMenuItem>
-            <DropdownMenuItem className="group hover:bg-blue-500/20 data-[highlighted]:bg-blue-500/20 transition-colors">
-              <Settings className="mr-2 size-4 text-gray-400 group-hover:text-blue-300 group-data-[highlighted]:text-blue-300 transition-colors" />
-              <span className="text-gray-300 group-hover:text-blue-300 group-data-[highlighted]:text-blue-300 transition-colors">
+            <DropdownMenuItem className="group hover:bg-gray-100 dark:hover:bg-blue-500/20 data-[highlighted]:bg-gray-100 dark:data-[highlighted]:bg-blue-500/20 transition-colors">
+              <Settings className="mr-2 size-4 text-gray-500 dark:text-gray-400 group-hover:text-blue-600 dark:group-hover:text-blue-300 group-data-[highlighted]:text-blue-600 dark:group-data-[highlighted]:text-blue-300 transition-colors" />
+              <span className="text-gray-700 dark:text-gray-300 group-hover:text-blue-600 dark:group-hover:text-blue-300 group-data-[highlighted]:text-blue-600 dark:group-data-[highlighted]:text-blue-300 transition-colors">
                 Paramètres
               </span>
             </DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem className="group text-red-400 hover:text-red-300 data-[highlighted]:text-red-300 hover:bg-red-500/10 data-[highlighted]:bg-red-500/10 transition-colors">
-              <LogOut className="mr-2 size-4 group-hover:text-red-300 group-data-[highlighted]:text-red-300 transition-colors" />
-              <span className="group-hover:text-red-300 group-data-[highlighted]:text-red-300 transition-colors">
+            <DropdownMenuSeparator className="dark:bg-white/10" />
+            <DropdownMenuItem className="group text-red-500 dark:text-red-400 hover:text-red-600 dark:hover:text-red-300 data-[highlighted]:text-red-600 dark:data-[highlighted]:text-red-300 hover:bg-red-100 dark:hover:bg-red-500/10 data-[highlighted]:bg-red-100 dark:data-[highlighted]:bg-red-500/10 transition-colors">
+              <LogOut className="mr-2 size-4 group-hover:text-red-600 dark:group-hover:text-red-300 group-data-[highlighted]:text-red-600 dark:group-data-[highlighted]:text-red-300 transition-colors" />
+              <span className="group-hover:text-red-600 dark:group-hover:text-red-300 group-data-[highlighted]:text-red-600 dark:group-data-[highlighted]:text-red-300 transition-colors">
                 Déconnexion
               </span>
             </DropdownMenuItem>
