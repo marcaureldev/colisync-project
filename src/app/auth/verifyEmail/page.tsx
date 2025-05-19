@@ -36,6 +36,7 @@ const VerifyEmail = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
   const [isVerifying, setIsVerifying] = useState(false);
+  const [isVerified, setIsVerified] = useState(false);
 
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
@@ -64,6 +65,7 @@ const VerifyEmail = () => {
 
       if (response.ok && result.success) {
         setSuccess("Email vérifié avec succès");
+        setIsVerified(true);
         // Redirection après un court délai pour montrer le message de succès
         setTimeout(() => {
           router.push("/admin/dashboard");
@@ -218,7 +220,7 @@ const VerifyEmail = () => {
                 <Button
                   type="submit"
                   className="w-full mt-6 bg-blue-500 hover:bg-blue-600 relative flex items-center justify-center"
-                  disabled={isLoading}
+                  disabled={isLoading || isVerified}
                 >
                   {isLoading ? (
                     <div className="py-2">
@@ -229,6 +231,8 @@ const VerifyEmail = () => {
                         aria-label="Chargement"
                       />
                     </div>
+                  ) : isVerified ? (
+                    <span className="text-white py-2">Email vérifié ✓</span>
                   ) : (
                     <span className="text-white py-2">Vérifier</span>
                   )}
@@ -241,7 +245,7 @@ const VerifyEmail = () => {
         {/* Zone pour le message en cas de vérification auto */}
         {autoVerify && isVerifying && (
           <div className="my-6 text-center">
-            {isLoading && (
+            {isLoading ? (
               <div className="flex flex-col items-center justify-center space-y-2">
                 <BeatLoader
                   color={"#3B82F6"}
@@ -254,6 +258,10 @@ const VerifyEmail = () => {
                   Vérification en cours...
                 </p>
               </div>
+            ) : isVerified ? (
+              <span className="text-white py-2">Email vérifié ✓</span>
+            ) : (
+              <span className="text-white py-2">Vérifier</span>
             )}
 
             {error && (
@@ -277,7 +285,7 @@ const VerifyEmail = () => {
         )}
 
         {/* Section pour renvoyer le code */}
-        <div className="mt-6 text-center">
+        {/* <div className="mt-6 text-center">
           <p className="text-gray-300">
             Vous n'avez pas reçu de code?{" "}
             {timeLeft > 0 ? (
@@ -285,6 +293,26 @@ const VerifyEmail = () => {
             ) : (
               <button
                 className="text-blue-400 font-medium hover:underline"
+              >
+                Renvoyer le code
+              </button>
+            )}
+          </p>
+        </div> */}
+
+        <div className="mt-6 text-center">
+          <p className="text-gray-300">
+            Vous n'avez pas reçu de code?{" "}
+            {timeLeft > 0 ? (
+              <span className="text-gray-400">Renvoyer dans {timeLeft}s</span>
+            ) : (
+              <button
+                disabled={isLoading || timeLeft > 0}
+                className={`text-blue-400 font-medium hover:underline ${
+                  isLoading || timeLeft > 0
+                    ? "opacity-50 cursor-not-allowed"
+                    : ""
+                }`}
               >
                 Renvoyer le code
               </button>

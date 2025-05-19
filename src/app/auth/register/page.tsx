@@ -60,6 +60,7 @@ const Register = () => {
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     try {
+      setError(null);
       setIsLoading(true);
       const response = await fetch("/api/auth/register", {
         method: "POST",
@@ -86,6 +87,8 @@ const Register = () => {
         },
         { status: 500 }
       );
+    } finally {
+      setIsLoading(false);
     }
   }
 
@@ -99,6 +102,11 @@ const Register = () => {
           </p>
 
           <Form {...form}>
+            {error && (
+              <div className="w-full px-2 py-3 mb-4 text-xs text-red-500 bg-red-100/10 border border-red-500 rounded-md">
+                {error}
+              </div>
+            )}
             <form
               onSubmit={form.handleSubmit(onSubmit)}
               className="w-full space-y-4"
@@ -179,29 +187,29 @@ const Register = () => {
 
               <Button
                 type="submit"
-                className="w-full mt-6 bg-blue-500 hover:bg-blue-600"
+                className={`w-full mt-6 bg-blue-500 hover:bg-blue-600 transition-all duration-200 cursor-pointer ${isLoading ? "opacity-50 cursor-not-allowed" : ""}`}
                 disabled={isLoading}
               >
                 {isLoading ? (
-                    <div className="py-2">
-                      <ClipLoader
-                        color={"#ffffff"}
-                        loading={isLoading}
-                        size={18}
-                        aria-label="Chargement"
-                      />
-                    </div>
-                  ) : (
-                    <span className="text-white py-2">S'inscrire</span>
-                  )}
-                
+                  <div className="py-2 flex items-center justify-center">
+                    <ClipLoader
+                      color={"#ffffff"}
+                      loading={true}
+                      size={18}
+                      aria-label="Chargement"
+                    />
+                    <span className="ml-2">Traitement en cours...</span>
+                  </div>
+                ) : (
+                  <span className="text-white py-2">S'inscrire</span>
+                )}
               </Button>
             </form>
           </Form>
 
           <p className="text-xs mt-6">
             Vous avez déjà un compte?{" "}
-            <Link href="/login" className="text-blue-400 hover:underline">
+            <Link href="/auth/login" className="text-blue-400 hover:underline">
               Connectez-vous
             </Link>
           </p>
