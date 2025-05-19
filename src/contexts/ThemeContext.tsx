@@ -18,20 +18,21 @@ interface ThemeContextType {
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
 export const ThemeProvider = ({ children }: { children: ReactNode }) => {
-  const [theme, setTheme] = useState<Theme>("dark"); // Défaut sur sombre pour correspondre à votre design actuel
-
-  useEffect(() => {
-    const storedTheme = localStorage.getItem("theme") as Theme | null;
-    if (storedTheme) {
-      setTheme(storedTheme);
-    } else {
-      // Si aucune préférence stockée, vérifier la préférence système
-      const prefersDark = window.matchMedia(
-        "(prefers-color-scheme: dark)"
-      ).matches;
-      setTheme(prefersDark ? "dark" : "light");
+  const [theme, setTheme] = useState<Theme>(() => {
+    if (typeof window === "undefined") {
+      return "dark";
     }
-  }, []);
+    const storedTheme = localStorage.getItem("theme") as Theme | null;
+    // Valider que le thème stocké est bien "light" ou "dark"
+    if (storedTheme === "light" || storedTheme === "dark") {
+      return storedTheme;
+    }
+    // Si aucune préférence valide n'est stockée, vérifier la préférence système
+    const prefersDark = window.matchMedia(
+      "(prefers-color-scheme: dark)"
+    ).matches;
+    return prefersDark ? "dark" : "light";
+  });
 
   useEffect(() => {
     if (theme === "dark") {
@@ -39,7 +40,10 @@ export const ThemeProvider = ({ children }: { children: ReactNode }) => {
     } else {
       document.documentElement.classList.remove("dark");
     }
-    localStorage.setItem("theme", theme);
+    // S'assurer que localStorage n'est accédé que côté client
+    if (typeof window !== "undefined") {
+      localStorage.setItem("theme", theme);
+    }
   }, [theme]);
 
   const toggleTheme = () => {
