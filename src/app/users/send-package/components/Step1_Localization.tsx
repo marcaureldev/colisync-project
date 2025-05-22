@@ -11,13 +11,13 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
-interface Step2LocalizationProps {
+interface Step1LocalizationProps {
   data: LocalizationFormData;
   updateData: (fields: Partial<LocalizationFormData>) => void;
 }
 
 // Interface pour les méthodes exposées par le ref
-export interface Step2Ref {
+export interface Step1Ref {
   validateForm: () => boolean;
 }
 
@@ -128,7 +128,7 @@ const LocationSection: React.FC<LocationSectionProps> = ({
   );
 };
 
-const Step2_Localization = forwardRef<Step2Ref, Step2LocalizationProps>(
+const Step1_Localization = forwardRef<Step1Ref, Step1LocalizationProps>(
   ({ data, updateData }, ref) => {
     const [errors, setErrors] = useState<LocalizationErrors>({});
 
@@ -168,7 +168,8 @@ const Step2_Localization = forwardRef<Step2Ref, Step2LocalizationProps>(
         today.setHours(0, 0, 0, 0); // Comparer uniquement la date, pas l'heure
         const selectedDate = new Date(data.shippingDate);
         if (selectedDate < today) {
-          newErrors.shippingDate = "La date d'envoi ne peut pas être dans le passé.";
+          newErrors.shippingDate =
+            "La date d'envoi ne peut pas être dans le passé.";
         }
       }
 
@@ -180,10 +181,13 @@ const Step2_Localization = forwardRef<Step2Ref, Step2LocalizationProps>(
       validateForm,
     }));
 
-    const handleGenericChange = (fieldName: keyof LocalizationFormData, value: string) => {
+    const handleGenericChange = (
+      fieldName: keyof LocalizationFormData,
+      value: string
+    ) => {
       updateData({ [fieldName]: value });
       if (errors[fieldName as keyof LocalizationErrors]) {
-         setErrors(prev => ({...prev, [fieldName]: undefined }));
+        setErrors((prev) => ({ ...prev, [fieldName]: undefined }));
       }
     };
 
@@ -200,17 +204,28 @@ const Step2_Localization = forwardRef<Step2Ref, Step2LocalizationProps>(
       };
 
       // Si le champ modifié est 'ville'
-      if (field === 'ville') {
-        if (zone === 'zoneDepart' && value && value === data.zoneDestination.ville) {
+      if (field === "ville") {
+        if (
+          zone === "zoneDepart" &&
+          value &&
+          value === data.zoneDestination.ville
+        ) {
           // Si la nouvelle ville de départ est la même que la destination, réinitialiser la destination
-          updatedFields.zoneDestination = { ...data.zoneDestination, ville: '' };
-        } else if (zone === 'zoneDestination' && value && value === data.zoneDepart.ville) {
+          updatedFields.zoneDestination = {
+            ...data.zoneDestination,
+            ville: "",
+          };
+        } else if (
+          zone === "zoneDestination" &&
+          value &&
+          value === data.zoneDepart.ville
+        ) {
           // Si la nouvelle ville de destination est la même que le départ, réinitialiser le départ
           // Normalement empêché par la désactivation, mais bonne sécurité
-          updatedFields.zoneDepart = { ...data.zoneDepart, ville: '' };
+          updatedFields.zoneDepart = { ...data.zoneDepart, ville: "" };
         }
       }
-      
+
       updateData(updatedFields);
 
       // Effacer l'erreur pour ce champ spécifique lors de la modification
@@ -218,7 +233,7 @@ const Step2_Localization = forwardRef<Step2Ref, Step2LocalizationProps>(
         setErrors((prevErrors) => {
           const updatedZoneErrors = { ...prevErrors[zone] };
           delete updatedZoneErrors[field];
-          
+
           const finalErrors = { ...prevErrors };
           if (Object.keys(updatedZoneErrors).length > 0) {
             finalErrors[zone] = updatedZoneErrors;
@@ -226,8 +241,16 @@ const Step2_Localization = forwardRef<Step2Ref, Step2LocalizationProps>(
             delete finalErrors[zone];
           }
           // Nettoyer l'objet d'erreur principal si zoneDepart ou zoneDestination est maintenant vide
-          if (finalErrors.zoneDepart && Object.keys(finalErrors.zoneDepart).length === 0) delete finalErrors.zoneDepart;
-          if (finalErrors.zoneDestination && Object.keys(finalErrors.zoneDestination).length === 0) delete finalErrors.zoneDestination;
+          if (
+            finalErrors.zoneDepart &&
+            Object.keys(finalErrors.zoneDepart).length === 0
+          )
+            delete finalErrors.zoneDepart;
+          if (
+            finalErrors.zoneDestination &&
+            Object.keys(finalErrors.zoneDestination).length === 0
+          )
+            delete finalErrors.zoneDestination;
 
           return finalErrors;
         });
@@ -264,22 +287,28 @@ const Step2_Localization = forwardRef<Step2Ref, Step2LocalizationProps>(
 
         {/* Section pour la date d'envoi */}
         <div className="p-4 border border-gray-200 dark:border-gray-700 rounded-md">
-            <h3 className="text-md font-medium text-gray-700 dark:text-gray-300 mb-2">Date d'Envoi Souhaitée</h3>
-            <div>
-                <Label htmlFor="shippingDate" className="text-sm">Date d'envoi</Label>
-                <Input
-                    id="shippingDate"
-                    name="shippingDate"
-                    type="date"
-                    value={data.shippingDate}
-                    onChange={(e) => handleGenericChange('shippingDate', e.target.value)}
-                    className={`mt-1 w-full bg-white dark:bg-white/10 border-gray-300 dark:border-gray-600 ${errors.shippingDate ? "border-red-500" : ""}`}
-                    min={new Date().toISOString().split("T")[0]} // Empêche la sélection de dates passées dans le picker
-                />
-                {errors.shippingDate && (
-                    <p className="text-xs text-red-500 mt-1">{errors.shippingDate}</p>
-                )}
-            </div>
+          <h3 className="text-md font-medium text-gray-700 dark:text-gray-300 mb-2">
+            Date d'Envoi Souhaitée
+          </h3>
+          <div>
+            <Label htmlFor="shippingDate" className="text-sm">
+              Date d'envoi
+            </Label>
+            <Input
+              id="shippingDate"
+              name="shippingDate"
+              type="date"
+              value={data.shippingDate}
+              onChange={(e) =>
+                handleGenericChange("shippingDate", e.target.value)
+              }
+              className={`mt-1 w-full bg-white dark:bg-white/10 border-gray-300 dark:border-gray-600 ${errors.shippingDate ? "border-red-500" : ""}`}
+              min={new Date().toISOString().split("T")[0]} // Empêche la sélection de dates passées dans le picker
+            />
+            {errors.shippingDate && (
+              <p className="text-xs text-red-500 mt-1">{errors.shippingDate}</p>
+            )}
+          </div>
         </div>
 
         <div className="mt-6 p-8 bg-gray-100 dark:bg-gray-800/30 rounded-md text-center">
@@ -293,5 +322,5 @@ const Step2_Localization = forwardRef<Step2Ref, Step2LocalizationProps>(
   }
 );
 
-Step2_Localization.displayName = "Step2_Localization";
-export default Step2_Localization;
+Step1_Localization.displayName = "Step1_Localization";
+export default Step1_Localization;

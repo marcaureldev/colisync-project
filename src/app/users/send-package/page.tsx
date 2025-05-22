@@ -1,22 +1,22 @@
 "use client";
 import React, { useState, useRef } from "react";
 import StepperNav from "./components/StepperNav";
-import Step1_PackageDetails, {
-  Step1Ref,
-} from "./components/Step1_PackageDetails";
-import Step2_Localization, { Step2Ref } from "./components/Step2_Localization";
-import Step3_Contact, { Step3Ref } from "./components/Step3_Contact";
+import Step1_Localization, { Step1Ref } from "./components/Step1_Localization";
+import Step2_Contact, { Step2Ref } from "./components/Step2_Contact";
+import Step3_DetailsPackage, {
+  Step3Ref,
+} from "./components/Step3_DetailsPackage";
 import Step4_ReviewAndConfirm, {
   Step4Ref,
-} from "./components/Step4_ReviewAndConfirm"; // Importer Step4
+} from "./components/Step4_ReviewAndConfirm";
 import { Button } from "@/components/ui/button";
 import {
   SendPackageFormData,
-  PackageDetailsFormData,
   LocalizationFormData,
   LocationPoint,
   ContactFormData,
   ReviewAndConfirmFormData,
+  PackageItem,
 } from "./types";
 import {
   Package,
@@ -28,9 +28,9 @@ import {
 } from "lucide-react";
 
 const steps = [
-  { id: 1, name: "Détails Colis", Icon: Package },
-  { id: 2, name: "Localisation & Date", Icon: MapPin }, // Nom ajusté
-  { id: 3, name: "Contact", Icon: User },
+  { id: 1, name: "Localisation & Date", Icon: MapPin },
+  { id: 2, name: "Contact", Icon: User },
+  { id: 3, name: "Détails Colis", Icon: Package },
   { id: 4, name: "Confirmation", Icon: CheckCircle },
 ];
 
@@ -38,16 +38,6 @@ const initialLocationPoint: LocationPoint = {
   ville: "",
   quartier: "",
   adressePrecise: "",
-};
-
-const initialPackageDetails: PackageDetailsFormData = {
-  packageType: "standard",
-  weight: "",
-  value: "",
-  // length: "",
-  // width: "",
-  // height: "",
-  description: "",
 };
 
 const initialLocalization: LocalizationFormData = {
@@ -66,29 +56,28 @@ const initialContact: ContactFormData = {
 };
 
 const initialReviewAndConfirm: ReviewAndConfirmFormData = {
-  // preferredShipDate: '', // Supprimé ou commenté
-  insurance: false, // Vous pouvez ajouter un champ pour cela dans une étape précédente si besoin
   acceptTerms: false,
 };
 
 const SendPackagePage = () => {
   const [currentStep, setCurrentStep] = useState(1);
   const [formData, setFormData] = useState<SendPackageFormData>({
-    packageDetails: initialPackageDetails,
     localization: initialLocalization,
     contact: initialContact,
+    packageDetails: [], // Initialiser comme un tableau vide
     reviewAndConfirm: initialReviewAndConfirm,
   });
 
   const step1Ref = useRef<Step1Ref>(null);
   const step2Ref = useRef<Step2Ref>(null);
   const step3Ref = useRef<Step3Ref>(null);
-  const step4Ref = useRef<Step4Ref>(null); // Ref pour l'étape 4
+  const step4Ref = useRef<Step4Ref>(null);
 
-  const updatePackageDetails = (fields: Partial<PackageDetailsFormData>) => {
+  // Mettre à jour updatePackageDetails pour gérer un tableau de PackageItem
+  const updatePackageDetails = (newPackages: PackageItem[]) => {
     setFormData((prev) => ({
       ...prev,
-      packageDetails: { ...prev.packageDetails, ...fields },
+      packageDetails: newPackages,
     }));
   };
 
@@ -117,14 +106,15 @@ const SendPackagePage = () => {
 
   const nextStep = async () => {
     let isValid = true;
-    if (currentStep === 1 && step1Ref.current) {
-      isValid = step1Ref.current.validateForm();
-    } else if (currentStep === 2 && step2Ref.current) {
+    // Logique de validation corrigée et adaptée :
+    if (currentStep === 1 && step2Ref.current) {
       isValid = step2Ref.current.validateForm();
-    } else if (currentStep === 3 && step3Ref.current) {
+    } else if (currentStep === 2 && step3Ref.current) {
       isValid = step3Ref.current.validateForm();
+    } else if (currentStep === 3 && step1Ref.current) {
+      // Validation pour Détails Colis
+      isValid = step1Ref.current.validateForm();
     }
-    // Pas de nextStep depuis l'étape 4, le bouton devient "Confirmer"
 
     if (isValid) {
       setCurrentStep((prev) => Math.min(prev + 1, steps.length));
@@ -148,26 +138,26 @@ const SendPackagePage = () => {
     switch (currentStep) {
       case 1:
         return (
-          <Step1_PackageDetails
+          <Step1_Localization
             ref={step1Ref}
-            data={formData.packageDetails}
-            updateData={updatePackageDetails}
-          />
-        );
-      case 2:
-        return (
-          <Step2_Localization
-            ref={step2Ref}
             data={formData.localization}
             updateData={updateLocalization}
           />
         );
-      case 3:
+      case 2:
         return (
-          <Step3_Contact
-            ref={step3Ref}
+          <Step2_Contact
+            ref={step2Ref}
             data={formData.contact}
             updateData={updateContact}
+          />
+        );
+      case 3:
+        return (
+          <Step3_DetailsPackage
+            ref={step3Ref}
+            data={formData.packageDetails}
+            updateData={updatePackageDetails}
           />
         );
       case 4:
