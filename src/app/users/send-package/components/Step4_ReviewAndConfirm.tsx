@@ -79,8 +79,18 @@ const Step4_ReviewAndConfirm = forwardRef<Step4Ref, Step4Props>(
       }
     };
 
-    // Calcul simple du prix (à remplacer par une logique réelle)
-    const estimatedPrice = 3750; // Exemple de prix
+    // Calcul simple du prix
+    const estimatedPrice =
+      formData.packageDetails.reduce((acc, pkg) => {
+        let pricePerKg = 500;
+        if (pkg.packageType === "express") pricePerKg = 1000;
+        else if (pkg.packageType === "large") pricePerKg = 700;
+        const weight = parseFloat(pkg.weight) || 0;
+        const quantity = parseInt(pkg.quantity) || 1;
+        return (
+          acc + weight * pricePerKg * quantity * 0.01
+        ); // Exemple: 1% de la valeur
+      }, 0) + 1000; // Frais de base
 
     const formatDate = (dateString: string) => {
       if (!dateString) return "Non spécifiée";
@@ -100,17 +110,37 @@ const Step4_ReviewAndConfirm = forwardRef<Step4Ref, Step4Props>(
         </h2>
 
         <dl className="divide-y divide-gray-200 dark:divide-gray-700 bg-gray-50 dark:bg-gray-800/30 p-4 sm:p-6 rounded-md">
-          <DetailItem
-            label="Type de colis:"
-            value={
-              packageTypeDisplay[formData.packageDetails.packageType] ||
-              formData.packageDetails.packageType
-            }
-          />
-          <DetailItem
-            label="Poids:"
-            value={`${formData.packageDetails.weight || "N/A"} kg`}
-          />
+          {/* Section pour afficher les détails de chaque colis */}
+          {formData.packageDetails.length > 0 && (
+            <div className="py-2">
+              <dt className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">
+                Colis ({formData.packageDetails.length}):
+              </dt>
+              {formData.packageDetails.map((pkg, index) => (
+                <dd
+                  key={pkg.id || index}
+                  className="ml-4 mb-2 p-2 border-l-2 border-gray-300 dark:border-gray-600 pl-3 text-sm"
+                >
+                  <p>
+                    <strong>Description:</strong> {pkg.description}
+                  </p>
+                  <p>
+                    <strong>Type:</strong>{" "}
+                    {packageTypeDisplay[pkg.packageType] || pkg.packageType}
+                  </p>
+                  <p>
+                    <strong>Quantité:</strong> {pkg.quantity}
+                  </p>
+                  <p>
+                    <strong>Poids:</strong> {pkg.weight} kg
+                  </p>
+                  {/* <p>
+                    <strong>Valeur:</strong> {pkg.value} FCFA
+                  </p> */}
+                </dd>
+              ))}
+            </div>
+          )}
           <DetailItem
             label="De:"
             value={`${getCityName(formData.localization.zoneDepart.ville)}, ${formData.localization.zoneDepart.adressePrecise || formData.localization.zoneDepart.quartier}`}
@@ -131,9 +161,6 @@ const Step4_ReviewAndConfirm = forwardRef<Step4Ref, Step4Props>(
             label="Destinataire:"
             value={`${formData.contact.recipientName} (${formData.contact.recipientPhone})`}
           />
-          {formData.reviewAndConfirm.insurance && (
-            <DetailItem label="Assurance colis:" value="Oui" />
-          )}
           {formData.contact.additionalInstructions && (
             <DetailItem
               label="Instructions additionnelles:"
