@@ -7,7 +7,7 @@ import React, {
 } from "react";
 import {
   SendPackageFormData,
-  ReviewAndConfirmFormData,
+//   ReviewAndConfirmFormData,
   PackageItem,
 } from "../types";
 import { Label } from "@/components/ui/label";
@@ -41,7 +41,7 @@ const packageCategoryDisplay: Record<string, string> = {
 
 interface Step4Props {
   formData: SendPackageFormData; // Toutes les données du formulaire
-  updateReviewData: (fields: Partial<ReviewAndConfirmFormData>) => void;
+//   updateReviewData: (fields: Partial<ReviewAndConfirmFormData>) => void;
 }
 
 export interface Step4Ref {
@@ -72,8 +72,8 @@ interface ReviewPackageItem extends PackageItem {
 }
 
 const Step4_ReviewAndConfirm = forwardRef<Step4Ref, Step4Props>(
-  ({ formData, updateReviewData }, ref) => {
-    const [errors, setErrors] = useState<ReviewErrors>({});
+  ({ formData }, ref) => {
+    // const [errors, setErrors] = useState<ReviewErrors>({});
     // Gérer les URLs d'objets pour les images dans le récapitulatif
     const [reviewPackageItems, setReviewPackageItems] = useState<
       ReviewPackageItem[]
@@ -107,25 +107,25 @@ const Step4_ReviewAndConfirm = forwardRef<Step4Ref, Step4Props>(
       };
     }, [formData.packageDetails]); // Se déclenche si les détails des colis changent
 
-    const validateForm = () => {
-      const newErrors: ReviewErrors = {};
-      if (!formData.reviewAndConfirm.acceptTerms) {
-        newErrors.acceptTerms = "Vous devez accepter les conditions générales.";
-      }
-      setErrors(newErrors);
-      return Object.keys(newErrors).length === 0;
-    };
+    // const validateForm = () => {
+    //   const newErrors: ReviewErrors = {};
+    //   if (!formData.reviewAndConfirm.acceptTerms) {
+    //     newErrors.acceptTerms = "Vous devez accepter les conditions générales.";
+    //   }
+    //   setErrors(newErrors);
+    //   return Object.keys(newErrors).length === 0;
+    // };
 
-    useImperativeHandle(ref, () => ({
-      validateForm,
-    }));
+    // useImperativeHandle(ref, () => ({
+    //   validateForm,
+    // }));
 
-    const handleAcceptTermsChange = (checked: boolean) => {
-      updateReviewData({ acceptTerms: checked });
-      if (errors.acceptTerms) {
-        setErrors((prev) => ({ ...prev, acceptTerms: undefined }));
-      }
-    };
+    // const handleAcceptTermsChange = (checked: boolean) => {
+    //   updateReviewData({ acceptTerms: checked });
+    //   if (errors.acceptTerms) {
+    //     setErrors((prev) => ({ ...prev, acceptTerms: undefined }));
+    //   }
+    // };
 
     const formatDate = (dateString: string) => {
       if (!dateString) return "Non spécifiée";
@@ -224,7 +224,7 @@ const Step4_ReviewAndConfirm = forwardRef<Step4Ref, Step4Props>(
           Prix estimé: FCFA
         </div>
 
-        <div className="items-top flex space-x-2 pt-4">
+        {/* <div className="items-top flex space-x-2 pt-4">
           <Checkbox
             id="acceptTerms"
             checked={formData.reviewAndConfirm.acceptTerms}
@@ -255,7 +255,7 @@ const Step4_ReviewAndConfirm = forwardRef<Step4Ref, Step4Props>(
               <p className="text-xs text-red-500">{errors.acceptTerms}</p>
             )}
           </div>
-        </div>
+        </div> */}
 
         <Alert
           variant="default"
