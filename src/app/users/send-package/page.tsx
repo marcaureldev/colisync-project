@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useRef } from "react";
+import React, { useRef } from "react";
 import StepperNav from "./components/StepperNav";
 import Step1_Localization, { Step1Ref } from "./components/Step1_Localization";
 import Step2_Contact, { Step2Ref } from "./components/Step2_Contact";
@@ -10,18 +10,11 @@ import Step4_ReviewAndConfirm, {
   Step4Ref,
 } from "./components/Step4_ReviewAndConfirm";
 import { Button } from "@/components/ui/button";
+import { useReservation } from "@/contexts/ReservationContext";
 import {
-  SendPackageFormData,
-  LocalizationFormData,
-  LocationPoint,
-  ContactFormData,
-  ReviewAndConfirmFormData,
-  PackageItem,
-} from "./types";
-import {
-  Package,
   MapPin,
   User,
+  Package,
   CheckCircle,
   ArrowRight,
   ArrowLeft,
@@ -34,75 +27,21 @@ const steps = [
   { id: 4, name: "Confirmation", Icon: CheckCircle },
 ];
 
-const initialLocationPoint: LocationPoint = {
-  ville: "",
-  quartier: "",
-  adressePrecise: "",
-};
-
-const initialLocalization: LocalizationFormData = {
-  zoneDepart: { ...initialLocationPoint },
-  zoneDestination: { ...initialLocationPoint },
-  shippingDate: "",
-};
-
-const initialContact: ContactFormData = {
-  senderName: "",
-  senderPhone: "",
-  recipientName: "",
-  recipientPhone: "",
-  notifyRecipient: true,
-  additionalInstructions: "",
-};
-
-const initialReviewAndConfirm: ReviewAndConfirmFormData = {
-  acceptTerms: false,
-};
-
 const SendPackagePage = () => {
-  const [currentStep, setCurrentStep] = useState(1);
-  const [formData, setFormData] = useState<SendPackageFormData>({
-    localization: initialLocalization,
-    contact: initialContact,
-    packageDetails: [], // Initialiser comme un tableau vide
-    reviewAndConfirm: initialReviewAndConfirm,
-  });
+  // Utiliser le contexte au lieu des états locaux
+  const {
+    formData,
+    updateLocalization,
+    updateContact,
+    updatePackageDetails,
+    currentStep,
+    setCurrentStep,
+  } = useReservation();
 
   const step1Ref = useRef<Step1Ref>(null);
   const step2Ref = useRef<Step2Ref>(null);
   const step3Ref = useRef<Step3Ref>(null);
   const step4Ref = useRef<Step4Ref>(null);
-
-  // Mettre à jour updatePackageDetails pour gérer un tableau de PackageItem
-  const updatePackageDetails = (newPackages: PackageItem[]) => {
-    setFormData((prev) => ({
-      ...prev,
-      packageDetails: newPackages,
-    }));
-  };
-
-  const updateLocalization = (fields: Partial<LocalizationFormData>) => {
-    setFormData((prev) => ({
-      ...prev,
-      localization: { ...prev.localization, ...fields },
-    }));
-  };
-
-  const updateContact = (fields: Partial<ContactFormData>) => {
-    setFormData((prev) => ({
-      ...prev,
-      contact: { ...prev.contact, ...fields },
-    }));
-  };
-
-  const updateReviewAndConfirm = (
-    fields: Partial<ReviewAndConfirmFormData>
-  ) => {
-    setFormData((prev) => ({
-      ...prev,
-      reviewAndConfirm: { ...prev.reviewAndConfirm, ...fields },
-    }));
-  };
 
   const nextStep = async () => {
     let isValid = true;
@@ -117,10 +56,11 @@ const SendPackagePage = () => {
     }
 
     if (isValid) {
-      setCurrentStep((prev) => Math.min(prev + 1, steps.length));
+      setCurrentStep(Math.min(currentStep + 1, steps.length));
     }
   };
-  const prevStep = () => setCurrentStep((prev) => Math.max(prev - 1, 1));
+
+  const prevStep = () => setCurrentStep(Math.max(currentStep - 1, 1));
 
   const handleSubmit = () => {
     if (step4Ref.current && step4Ref.current.validateForm()) {
@@ -161,13 +101,7 @@ const SendPackagePage = () => {
           />
         );
       case 4:
-        return (
-          <Step4_ReviewAndConfirm
-            ref={step4Ref}
-            formData={formData}
-            updateReviewData={updateReviewAndConfirm}
-          />
-        );
+        return <Step4_ReviewAndConfirm ref={step4Ref} formData={formData} />;
       default:
         return <p>Étape inconnue</p>;
     }

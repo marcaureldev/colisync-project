@@ -32,15 +32,15 @@ export interface ContactFormData {
   additionalInstructions?: string;
 }
 
-export interface ReviewAndConfirmFormData {
-  // preferredShipDate: string; // Déjà géré par shippingDate dans LocalizationFormData, à supprimer si redondant
-  acceptTerms: boolean; // Nouveau champ pour les conditions générales
-}
+// export interface ReviewAndConfirmFormData {
+//   // preferredShipDate: string; // Déjà géré par shippingDate dans LocalizationFormData, à supprimer si redondant
+//   acceptTerms: boolean; // Nouveau champ pour les conditions générales
+// }
 
 // Type global pour toutes les données du formulaire
 export interface SendPackageFormData {
   packageDetails: PackageItem[]; // Modifié: maintenant un tableau de PackageItem
   localization: LocalizationFormData;
   contact: ContactFormData;
-  reviewAndConfirm: ReviewAndConfirmFormData;
+  // reviewAndConfirm: ReviewAndConfirmFormData;
 }
