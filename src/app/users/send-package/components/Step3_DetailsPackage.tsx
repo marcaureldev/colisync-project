@@ -5,7 +5,7 @@ import React, {
   forwardRef,
   useEffect,
 } from "react";
-import { PackageItem, PackageType } from "../types";
+import { PackageItem, PackageCategory } from "../types";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -50,15 +50,17 @@ const initialModalPackageState: Omit<PackageItem, "id"> = {
   description: "",
   quantity: "1",
   weight: "",
-  packageType: "standard",
+  packageCategory: "merchandises",
   // value: "",
   imageFile: null,
 };
 
-const packageTypeOptions: { value: PackageType; label: string }[] = [
-  { value: "standard", label: "Standard" },
-  { value: "large", label: "Large" },
-  { value: "express", label: "Express" },
+const packageCategoryOptions: { value: string; label: string }[] = [
+  { value: "merchandises", label: "Marchandises" },
+  { value: "documents", label: "Documents" },
+  { value: "electonics", label: "Appareils Electroniques" },
+  { value: "clothing", label: "Vêtements" },
+  { value: "others", label: "Autres" },
 ];
 
 const Step3_PackageDetails = forwardRef<Step3Ref, Step3Props>(
@@ -73,7 +75,42 @@ const Step3_PackageDetails = forwardRef<Step3Ref, Step3Props>(
     const [modalErrors, setModalErrors] = useState<
       Partial<Record<keyof Omit<PackageItem, "id">, string>>
     >({});
-    const [imagePreview, setImagePreview] = useState<string | null>(null);
+    const [modalImagePreview, setModalImagePreview] = useState<string | null>(
+      null
+    );
+
+    // Gérer les URLs d'objets pour les images dans le tableau
+    const [tablePackagePreviews, setTablePackagePreviews] = useState<
+      (PackageItem & { tableImagePreviewUrl?: string })[]
+    >([]);
+
+    useEffect(() => {
+      const newTablePreviews = packages.map((pkg) => {
+        let tableImagePreviewUrl;
+        if (pkg.imageFile) {
+          try {
+            tableImagePreviewUrl = URL.createObjectURL(pkg.imageFile);
+          } catch (error) {
+            console.error(
+              "Error creating object URL for table preview:",
+              error
+            );
+            tableImagePreviewUrl = undefined;
+          }
+        }
+        return { ...pkg, tableImagePreviewUrl };
+      });
+      setTablePackagePreviews(newTablePreviews);
+
+      // Nettoyage des URLs d'objets lors du démontage ou de la mise à jour des packages
+      return () => {
+        newTablePreviews.forEach((p) => {
+          if (p.tableImagePreviewUrl) {
+            URL.revokeObjectURL(p.tableImagePreviewUrl);
+          }
+        });
+      };
+    }, [packages]);
 
     useEffect(() => {
       if (isModalOpen) {
@@ -82,39 +119,44 @@ const Step3_PackageDetails = forwardRef<Step3Ref, Step3Props>(
             description: editingPackage.description,
             quantity: editingPackage.quantity,
             weight: editingPackage.weight,
-            packageType: editingPackage.packageType,
-            // value: editingPackage.value,
+            packageCategory: editingPackage.packageCategory,
             imageFile: editingPackage.imageFile || null,
           });
-
-          // Générer l'aperçu si une image existe déjà pour le colis en édition
           if (editingPackage.imageFile) {
-            setImagePreview(URL.createObjectURL(editingPackage.imageFile));
+            try {
+              setModalImagePreview(
+                URL.createObjectURL(editingPackage.imageFile)
+              );
+            } catch (error) {
+              console.error(
+                "Error creating object URL for modal preview:",
+                error
+              );
+              setModalImagePreview(null);
+            }
           } else {
-            setImagePreview(null);
+            setModalImagePreview(null);
           }
         } else {
           setModalFormData(initialModalPackageState);
-          setImagePreview(null); 
+          setModalImagePreview(null);
         }
         setModalErrors({});
       } else {
-        // Nettoyer l'URL de l'objet quand le modal est fermé pour libérer la mémoire
-        if (imagePreview) {
-          URL.revokeObjectURL(imagePreview);
-          setImagePreview(null);
+        if (modalImagePreview) {
+          URL.revokeObjectURL(modalImagePreview);
+          setModalImagePreview(null);
         }
       }
     }, [isModalOpen, editingPackage]);
 
-    // S'assurer de nettoyer l'URL de l'objet lors du démontage du composant
     useEffect(() => {
       return () => {
-        if (imagePreview) {
-          URL.revokeObjectURL(imagePreview);
+        if (modalImagePreview) {
+          URL.revokeObjectURL(modalImagePreview);
         }
       };
-    }, [imagePreview]);
+    }, [modalImagePreview]);
 
     const handleModalInputChange = (
       e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -123,16 +165,21 @@ const Step3_PackageDetails = forwardRef<Step3Ref, Step3Props>(
       if (type === "file") {
         const file = (e.target as HTMLInputElement).files?.[0] || null;
         setModalFormData((prev) => ({ ...prev, [name]: file }));
+        if (modalImagePreview) {
+          URL.revokeObjectURL(modalImagePreview);
+        }
         if (file) {
-          if (imagePreview) {
-            URL.revokeObjectURL(imagePreview);
+          try {
+            setModalImagePreview(URL.createObjectURL(file));
+          } catch (error) {
+            console.error(
+              "Error creating object URL for new modal image:",
+              error
+            );
+            setModalImagePreview(null);
           }
-          setImagePreview(URL.createObjectURL(file));
         } else {
-          if (imagePreview) {
-            URL.revokeObjectURL(imagePreview);
-          }
-          setImagePreview(null);
+          setModalImagePreview(null);
         }
       } else {
         setModalFormData((prev) => ({ ...prev, [name]: value }));
@@ -146,10 +193,10 @@ const Step3_PackageDetails = forwardRef<Step3Ref, Step3Props>(
     const handleModalSelectChange = (value: string) => {
       setModalFormData((prev) => ({
         ...prev,
-        packageType: value as PackageType,
+        packageCategory: value as PackageCategory,
       }));
-      if (modalErrors.packageType) {
-        setModalErrors((prev) => ({ ...prev, packageType: undefined }));
+      if (modalErrors.packageCategory) {
+        setModalErrors((prev) => ({ ...prev, packageCategory: undefined }));
       }
     };
 
@@ -164,8 +211,8 @@ const Step3_PackageDetails = forwardRef<Step3Ref, Step3Props>(
         newErrors.weight = "Le poids est requis et doit être positif.";
       // if (!modalFormData.value || parseFloat(modalFormData.value) <= 0)
       //   newErrors.value = "La valeur est requise et doit être positive.";
-      if (!modalFormData.packageType)
-        newErrors.packageType = "Le type de colis est requis.";
+      if (!modalFormData.packageCategory)
+        newErrors.packageCategory = "Le type de colis est requis.";
 
       setModalErrors(newErrors);
       return Object.keys(newErrors).length === 0;
@@ -298,16 +345,16 @@ const Step3_PackageDetails = forwardRef<Step3Ref, Step3Props>(
                     </Label>
                     <Select
                       name="packageType"
-                      value={modalFormData.packageType}
+                      value={modalFormData.packageCategory}
                       onValueChange={handleModalSelectChange}
                     >
                       <SelectTrigger
-                        className={`mt-1 w-full bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 ${modalErrors.packageType ? "border-red-500" : ""}`}
+                        className={`mt-1 w-full bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 ${modalErrors.packageCategory ? "border-red-500" : ""}`}
                       >
                         <SelectValue placeholder="Sélectionner un type" />
                       </SelectTrigger>
                       <SelectContent className="bg-white dark:bg-gray-800">
-                        {packageTypeOptions.map((option) => (
+                        {packageCategoryOptions.map((option) => (
                           <SelectItem
                             key={option.value}
                             value={option.value}
@@ -318,9 +365,9 @@ const Step3_PackageDetails = forwardRef<Step3Ref, Step3Props>(
                         ))}
                       </SelectContent>
                     </Select>
-                    {modalErrors.packageType && (
+                    {modalErrors.packageCategory && (
                       <p className="text-xs text-red-500 mt-1">
-                        {modalErrors.packageType}
+                        {modalErrors.packageCategory}
                       </p>
                     )}
                   </div>
@@ -387,10 +434,10 @@ const Step3_PackageDetails = forwardRef<Step3Ref, Step3Props>(
                     onChange={handleModalInputChange}
                     className="mt-1 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 dark:file:bg-blue-500/20 dark:file:text-blue-300 dark:hover:file:bg-blue-500/30 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-300"
                   />
-                  {imagePreview && (
+                  {modalImagePreview && (
                     <div className="mt-2">
                       <img
-                        src={imagePreview}
+                        src={modalImagePreview}
                         alt="Aperçu du colis"
                         className="h-24 w-auto rounded-md object-cover"
                       />
@@ -449,6 +496,9 @@ const Step3_PackageDetails = forwardRef<Step3Ref, Step3Props>(
                     N°
                   </TableHead>
                   <TableHead className="text-gray-700 dark:text-gray-300">
+                    Photo
+                  </TableHead>
+                  <TableHead className="text-gray-700 dark:text-gray-300">
                     Description
                   </TableHead>
                   <TableHead className="text-gray-700 dark:text-gray-300">
@@ -472,6 +522,20 @@ const Step3_PackageDetails = forwardRef<Step3Ref, Step3Props>(
                       {index + 1}
                     </TableCell>
                     <TableCell className="text-gray-600 dark:text-gray-300">
+                      {pkg.imageFile ? (
+                        <img
+                          src={
+                            tablePackagePreviews.find((p) => p.id === pkg.id)
+                              ?.tableImagePreviewUrl
+                          }
+                          alt="Package preview"
+                          className="h-12 w-12 object-cover rounded"
+                        />
+                      ) : (
+                        <span className="text-gray-400">No image</span>
+                      )}
+                    </TableCell>
+                    <TableCell className="text-gray-600 dark:text-gray-300">
                       {pkg.description}
                     </TableCell>
                     <TableCell className="text-gray-600 dark:text-gray-300">
@@ -481,9 +545,9 @@ const Step3_PackageDetails = forwardRef<Step3Ref, Step3Props>(
                       {pkg.weight}
                     </TableCell>
                     <TableCell className="text-gray-600 dark:text-gray-300">
-                      {packageTypeOptions.find(
-                        (opt) => opt.value === pkg.packageType
-                      )?.label || pkg.packageType}
+                      {packageCategoryOptions.find(
+                        (opt) => opt.value === pkg.packageCategory
+                      )?.label || pkg.packageCategory}
                     </TableCell>
                     <TableCell className="text-right space-x-2">
                       <Button
