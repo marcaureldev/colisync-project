@@ -1,10 +1,19 @@
 "use client";
-import React, { useState, useImperativeHandle, forwardRef } from "react";
-import { SendPackageFormData, ReviewAndConfirmFormData } from "../types";
+import React, {
+  useState,
+  useImperativeHandle,
+  forwardRef,
+  useEffect,
+} from "react";
+import {
+  SendPackageFormData,
+  ReviewAndConfirmFormData,
+  PackageItem,
+} from "../types";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { CheckCircle, Info } from "lucide-react";
+import { CheckCircle, Info, ImageIcon } from "lucide-react";
 
 // Recréer ou importer la liste des villes pour afficher les noms
 const villesBenin = [
@@ -22,10 +31,12 @@ const getCityName = (cityId: string) => {
   return city ? city.name : cityId;
 };
 
-const packageTypeDisplay: Record<string, string> = {
-  standard: "Standard",
-  large: "Large",
-  express: "Express",
+const packageCategoryDisplay: Record<string, string> = {
+  merchandise: "Marchandises",
+  documents: "Documents",
+  clothing: "Vêtements",
+  electonics: "Appareils électroniques",
+  other: "Autres",
 };
 
 interface Step4Props {
@@ -55,9 +66,46 @@ const DetailItem: React.FC<{
   </div>
 );
 
+// Interface pour gérer les URLs d'objets pour les images dans le récapitulatif
+interface ReviewPackageItem extends PackageItem {
+  reviewImagePreviewUrl?: string;
+}
+
 const Step4_ReviewAndConfirm = forwardRef<Step4Ref, Step4Props>(
   ({ formData, updateReviewData }, ref) => {
     const [errors, setErrors] = useState<ReviewErrors>({});
+    // Gérer les URLs d'objets pour les images dans le récapitulatif
+    const [reviewPackageItems, setReviewPackageItems] = useState<
+      ReviewPackageItem[]
+    >([]);
+
+    useEffect(() => {
+      const itemsWithPreviews = formData.packageDetails.map((pkg) => {
+        let reviewImagePreviewUrl;
+        if (pkg.imageFile) {
+          try {
+            reviewImagePreviewUrl = URL.createObjectURL(pkg.imageFile);
+          } catch (error) {
+            console.error(
+              "Error creating object URL for review preview:",
+              error
+            );
+            reviewImagePreviewUrl = undefined;
+          }
+        }
+        return { ...pkg, reviewImagePreviewUrl };
+      });
+      setReviewPackageItems(itemsWithPreviews);
+
+      // Nettoyage des URLs d'objets
+      return () => {
+        itemsWithPreviews.forEach((item) => {
+          if (item.reviewImagePreviewUrl) {
+            URL.revokeObjectURL(item.reviewImagePreviewUrl);
+          }
+        });
+      };
+    }, [formData.packageDetails]); // Se déclenche si les détails des colis changent
 
     const validateForm = () => {
       const newErrors: ReviewErrors = {};
@@ -79,19 +127,6 @@ const Step4_ReviewAndConfirm = forwardRef<Step4Ref, Step4Props>(
       }
     };
 
-    // Calcul simple du prix
-    const estimatedPrice =
-      formData.packageDetails.reduce((acc, pkg) => {
-        let pricePerKg = 500;
-        if (pkg.packageType === "express") pricePerKg = 1000;
-        else if (pkg.packageType === "large") pricePerKg = 700;
-        const weight = parseFloat(pkg.weight) || 0;
-        const quantity = parseInt(pkg.quantity) || 1;
-        return (
-          acc + weight * pricePerKg * quantity * 0.01
-        ); // Exemple: 1% de la valeur
-      }, 0) + 1000; // Frais de base
-
     const formatDate = (dateString: string) => {
       if (!dateString) return "Non spécifiée";
       const date = new Date(dateString);
@@ -111,32 +146,48 @@ const Step4_ReviewAndConfirm = forwardRef<Step4Ref, Step4Props>(
 
         <dl className="divide-y divide-gray-200 dark:divide-gray-700 bg-gray-50 dark:bg-gray-800/30 p-4 sm:p-6 rounded-md">
           {/* Section pour afficher les détails de chaque colis */}
-          {formData.packageDetails.length > 0 && (
+          {reviewPackageItems.length > 0 && (
             <div className="py-2">
               <dt className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">
-                Colis ({formData.packageDetails.length}):
+                Colis ({reviewPackageItems.length}):
               </dt>
-              {formData.packageDetails.map((pkg, index) => (
+              {reviewPackageItems.map((pkg, index) => (
                 <dd
                   key={pkg.id || index}
-                  className="ml-4 mb-2 p-2 border-l-2 border-gray-300 dark:border-gray-600 pl-3 text-sm"
+                  className="ml-0 sm:ml-4 mb-3 p-3 border rounded-md bg-white dark:bg-gray-700/50 border-gray-200 dark:border-gray-600/50 text-sm"
                 >
-                  <p>
-                    <strong>Description:</strong> {pkg.description}
-                  </p>
-                  <p>
-                    <strong>Type:</strong>{" "}
-                    {packageTypeDisplay[pkg.packageType] || pkg.packageType}
-                  </p>
-                  <p>
-                    <strong>Quantité:</strong> {pkg.quantity}
-                  </p>
-                  <p>
-                    <strong>Poids:</strong> {pkg.weight} kg
-                  </p>
-                  {/* <p>
-                    <strong>Valeur:</strong> {pkg.value} FCFA
-                  </p> */}
+                  <div className="flex flex-col sm:flex-row sm:items-start gap-3">
+                    {pkg.reviewImagePreviewUrl ? (
+                      <img
+                        src={pkg.reviewImagePreviewUrl}
+                        alt={`Colis ${pkg.description.substring(0, 20)}`}
+                        className="w-full sm:w-24 h-auto sm:h-24 rounded-md object-cover border dark:border-gray-600"
+                      />
+                    ) : (
+                      <div className="w-full sm:w-24 h-20 sm:h-24 rounded-md bg-gray-100 dark:bg-gray-600 flex items-center justify-center border dark:border-gray-500">
+                        <ImageIcon className="h-8 w-8 text-gray-400 dark:text-gray-500" />
+                      </div>
+                    )}
+                    <div className="">
+                      <p className="font-semibold text-gray-800 dark:text-white">
+                        {pkg.description}
+                      </p>
+                      <p>
+                        <strong>Type:</strong>{" "}
+                        {packageCategoryDisplay[pkg.packageCategory] ||
+                          pkg.packageCategory}
+                      </p>
+                      <p>
+                        <strong>Quantité:</strong> {pkg.quantity}
+                      </p>
+                      <p>
+                        <strong>Poids:</strong> {pkg.weight} kg
+                      </p>
+                      <p>
+                        <strong>Valeur:</strong> FCFA
+                      </p>
+                    </div>
+                  </div>
                 </dd>
               ))}
             </div>
@@ -170,7 +221,7 @@ const Step4_ReviewAndConfirm = forwardRef<Step4Ref, Step4Props>(
         </dl>
 
         <div className="text-right font-semibold text-lg text-blue-600 dark:text-blue-400">
-          Prix estimé: {estimatedPrice.toLocaleString("fr-FR")} FCFA
+          Prix estimé: FCFA
         </div>
 
         <div className="items-top flex space-x-2 pt-4">
