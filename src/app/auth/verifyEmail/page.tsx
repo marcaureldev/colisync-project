@@ -68,7 +68,7 @@ const VerifyEmail = () => {
         setIsVerified(true);
         // Redirection après un court délai pour montrer le message de succès
         setTimeout(() => {
-          router.push("/admin/dashboard");
+          router.push("/users/dashboard");
         }, 1500);
         return true;
       } else {

@@ -48,10 +48,9 @@ export interface Step3Ref {
 
 const initialModalPackageState: Omit<PackageItem, "id"> = {
   description: "",
-  quantity: "1",
-  weight: "",
+  quantity: 1,
+  weight: 1,
   packageCategory: "merchandises",
-  // value: "",
   imageFile: null,
 };
 
@@ -205,9 +204,9 @@ const Step3_PackageDetails = forwardRef<Step3Ref, Step3Props>(
         {};
       if (!modalFormData.description.trim())
         newErrors.description = "La description est requise.";
-      if (!modalFormData.quantity || parseInt(modalFormData.quantity) <= 0)
+      if (!modalFormData.quantity || modalFormData.quantity <= 0)
         newErrors.quantity = "La quantité doit être positive.";
-      if (!modalFormData.weight || parseFloat(modalFormData.weight) <= 0)
+      if (!modalFormData.weight || modalFormData.weight <= 0)
         newErrors.weight = "Le poids est requis et doit être positif.";
       // if (!modalFormData.value || parseFloat(modalFormData.value) <= 0)
       //   newErrors.value = "La valeur est requise et doit être positive.";
@@ -495,22 +494,22 @@ const Step3_PackageDetails = forwardRef<Step3Ref, Step3Props>(
                   <TableHead className="w-[50px] text-gray-700 dark:text-gray-300">
                     N°
                   </TableHead>
-                  <TableHead className="text-gray-700 dark:text-gray-300">
+                  <TableHead className="w-[80px] text-gray-700 dark:text-gray-300">
                     Photo
                   </TableHead>
-                  <TableHead className="text-gray-700 dark:text-gray-300">
+                  <TableHead className="w-1/4 min-w-[150px] max-w-[250px] text-gray-700 dark:text-gray-300">
                     Description
                   </TableHead>
-                  <TableHead className="text-gray-700 dark:text-gray-300">
+                  <TableHead className="w-[60px] text-gray-700 dark:text-gray-300">
                     Qté
                   </TableHead>
-                  <TableHead className="text-gray-700 dark:text-gray-300">
+                  <TableHead className="w-[80px] text-gray-700 dark:text-gray-300">
                     Poids (kg)
                   </TableHead>
-                  <TableHead className="text-gray-700 dark:text-gray-300">
+                  <TableHead className="w-[120px] text-gray-700 dark:text-gray-300">
                     Type
                   </TableHead>
-                  <TableHead className="text-right text-gray-700 dark:text-gray-300">
+                  <TableHead className="w-[100px] text-right text-gray-700 dark:text-gray-300">
                     Actions
                   </TableHead>
                 </TableRow>
@@ -535,8 +534,10 @@ const Step3_PackageDetails = forwardRef<Step3Ref, Step3Props>(
                         <span className="text-gray-400">No image</span>
                       )}
                     </TableCell>
-                    <TableCell className="text-gray-600 dark:text-gray-300">
-                      {pkg.description}
+                    <TableCell className="text-gray-600 dark:text-gray-300 max-w-[200px] truncate">
+                      <div className="truncate" title={pkg.description}>
+                        {pkg.description}
+                      </div>
                     </TableCell>
                     <TableCell className="text-gray-600 dark:text-gray-300">
                       {pkg.quantity}

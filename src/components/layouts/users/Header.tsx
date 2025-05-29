@@ -9,7 +9,7 @@ import {
   LogOut,
   Sun,
   Moon,
-} from "lucide-react"; // Importer Sun et Moon
+} from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import {
@@ -23,14 +23,16 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
-import { useTheme } from "@/contexts/ThemeContext"; // Importer useTheme
+import { useTheme } from "@/contexts/ThemeContext";
+import { useUser } from "@/contexts/UserContext";
 
 interface HeaderProps {
   toggleSidebar?: () => void;
 }
 
 const Header = ({ toggleSidebar }: HeaderProps) => {
-  const { theme, toggleTheme } = useTheme(); // Utiliser le contexte de thème
+  const { user, loading } = useUser();
+  const { theme, toggleTheme } = useTheme();
   const [notifications, setNotifications] = useState([
     {
       id: 1,
@@ -56,6 +58,13 @@ const Header = ({ toggleSidebar }: HeaderProps) => {
     );
   };
 
+  const getUserDisplayText = () => {
+    if (loading) return "Chargement...";
+    if (user?.displayName) return `Bienvenue, ${user.displayName}`;
+    if (user?.email) return `Bienvenue, ${user.email}`;
+    return "Bienvenue";
+  };
+
   return (
     <header className="border-b bg-white dark:border-white/10 dark:bg-white/5 backdrop-blur-lg p-4 flex items-center justify-between text-gray-800 dark:text-white">
       <div className="flex items-center gap-4">
@@ -68,16 +77,8 @@ const Header = ({ toggleSidebar }: HeaderProps) => {
           <Menu className="size-5" />
         </Button>
 
-        {/* <div className="relative max-w-md w-full hidden md:block">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 size-4" />
-          <Input
-            placeholder="Rechercher un colis..."
-            className="pl-10 bg-white/5 border-white/10 focus-visible:ring-blue-400"
-          />
-        </div> */}
-
         <div>
-          <p className="text-sm sm:text-base">Bienvenue, @Username</p>
+          <p className="text-sm sm:text-base">{getUserDisplayText()}</p>
         </div>
       </div>
 
@@ -94,6 +95,7 @@ const Header = ({ toggleSidebar }: HeaderProps) => {
             <Sun className="size-5 text-white" />
           )}
         </Button>
+
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" size="icon" className="relative">
@@ -166,7 +168,9 @@ const Header = ({ toggleSidebar }: HeaderProps) => {
               <Avatar>
                 <AvatarImage src="/placeholder-user.jpg" />
                 <AvatarFallback className="bg-blue-100 dark:bg-blue-500/20 text-blue-600 dark:text-blue-400">
-                  US
+                  {user?.displayName
+                    ? user.displayName.charAt(0).toUpperCase()
+                    : "U"}
                 </AvatarFallback>
               </Avatar>
             </Button>

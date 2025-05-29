@@ -6,9 +6,7 @@ import Step2_Contact, { Step2Ref } from "./components/Step2_Contact";
 import Step3_DetailsPackage, {
   Step3Ref,
 } from "./components/Step3_DetailsPackage";
-import Step4_ReviewAndConfirm, {
-  Step4Ref,
-} from "./components/Step4_ReviewAndConfirm";
+import Step4_ReviewAndConfirm from "./components/Step4_ReviewAndConfirm"; 
 import { Button } from "@/components/ui/button";
 import { useReservation } from "@/contexts/ReservationContext";
 import {
@@ -41,18 +39,18 @@ const SendPackagePage = () => {
   const step1Ref = useRef<Step1Ref>(null);
   const step2Ref = useRef<Step2Ref>(null);
   const step3Ref = useRef<Step3Ref>(null);
-  const step4Ref = useRef<Step4Ref>(null);
+  // Plus besoin de step4Ref
 
   const nextStep = async () => {
     let isValid = true;
     // Logique de validation corrigée et adaptée :
-    if (currentStep === 1 && step2Ref.current) {
-      isValid = step2Ref.current.validateForm();
-    } else if (currentStep === 2 && step3Ref.current) {
-      isValid = step3Ref.current.validateForm();
-    } else if (currentStep === 3 && step1Ref.current) {
-      // Validation pour Détails Colis
+    if (currentStep === 1 && step1Ref.current) {
       isValid = step1Ref.current.validateForm();
+    } else if (currentStep === 2 && step2Ref.current) {
+      isValid = step2Ref.current.validateForm();
+    } else if (currentStep === 3 && step3Ref.current) {
+      // Validation pour Détails Colis
+      isValid = step3Ref.current.validateForm();
     }
 
     if (isValid) {
@@ -62,16 +60,16 @@ const SendPackagePage = () => {
 
   const prevStep = () => setCurrentStep(Math.max(currentStep - 1, 1));
 
-  const handleSubmit = () => {
-    if (step4Ref.current && step4Ref.current.validateForm()) {
-      // Logique de soumission du formulaire
-      console.log("Formulaire complet soumis:", formData);
-      alert("Commande confirmée (simulation) ! \nDonnées en console.");
-      // Ici, vous enverriez les données à votre backend
-    } else {
-      // Normalement, la validation dans step4Ref.current.validateForm() affichera les erreurs
-      console.log("Validation de l'étape 4 échouée ou ref non disponible.");
-    }
+  const handleSubmit = async () => {
+    // Plus besoin de validation pour l'étape 4 puisqu'elle est juste un récapitulatif
+    console.log("Formulaire complet soumis:", formData);
+    const response = await fetch("/api/users/send-package", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(formData),
+    });
   };
 
   const renderStepContent = () => {
@@ -101,7 +99,7 @@ const SendPackagePage = () => {
           />
         );
       case 4:
-        return <Step4_ReviewAndConfirm ref={step4Ref} formData={formData} />;
+        return <Step4_ReviewAndConfirm formData={formData} />;
       default:
         return <p>Étape inconnue</p>;
     }

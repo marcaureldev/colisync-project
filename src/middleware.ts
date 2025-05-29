@@ -1,19 +1,18 @@
-// src/middleware.ts
 import { NextRequest, NextResponse } from "next/server";
-import * as jose from 'jose'; // Importez jose au lieu de jsonwebtoken
+import * as jose from 'jose';
 
 export async function middleware(request: NextRequest) {
   try {
     const access_token = request.cookies.get("access_token")?.value;
     const secret = process.env.JWT_SECRET_KEY;
     
-    // Vérifier si le token existe
+    // Vérification de l'existence du token
     if (!access_token) {
       console.log("Pas de token d'accès trouvé");
       return NextResponse.redirect(new URL("/auth/login", request.url));
     }
 
-    // Vérifier si la clé secrète est définie
+    // Vérification de la clé secrète
     if (!secret) {
       console.error("JWT_SECRET_KEY not defined in environment variables");
       return NextResponse.redirect(new URL("/auth/login", request.url));
@@ -27,7 +26,6 @@ export async function middleware(request: NextRequest) {
       // Si la vérification réussit, permettre l'accès
       return NextResponse.next();
     } catch (jwtError) {
-      // En cas d'erreur spécifique de JWT (token expiré, invalide, etc.)
       console.error("JWT verification error:", jwtError);
       const response = NextResponse.redirect(
         new URL("/auth/login", request.url)
@@ -42,5 +40,5 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/admin/:path*"],
+  matcher: ["/admin/:path*", "/users/:path*"],
 };

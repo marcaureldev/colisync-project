@@ -45,7 +45,7 @@ const Login = () => {
 
       if (response.ok) {
         form.reset();
-        router.push("/admin/dashboard");
+        router.push("/users/dashboard");
       } else {
         setError(data.error || "Une erreur est survenue lors de la connexion.");
       }
