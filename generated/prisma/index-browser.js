@@ -118,6 +118,7 @@ exports.Prisma.UserScalarFieldEnum = {
   email: 'email',
   displayName: 'displayName',
   password: 'password',
+  role: 'role',
   isAdmin: 'isAdmin',
   isActive: 'isActive',
   createdAt: 'createdAt',
@@ -134,6 +135,29 @@ exports.Prisma.AuthScalarFieldEnum = {
   updatedAt: 'updatedAt'
 };
 
+exports.Prisma.PackageScalarFieldEnum = {
+  id: 'id',
+  description: 'description',
+  quantity: 'quantity',
+  category: 'category',
+  weight: 'weight',
+  sender_userId: 'sender_userId',
+  reservationId: 'reservationId',
+  imageFile: 'imageFile',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.ReservationScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  additionalInfo: 'additionalInfo',
+  shippingDate: 'shippingDate',
+  status: 'status',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
 exports.Prisma.SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -143,11 +167,32 @@ exports.Prisma.QueryMode = {
   default: 'default',
   insensitive: 'insensitive'
 };
+exports.Role = exports.$Enums.Role = {
+  USER: 'USER',
+  RESPONSIBLE: 'RESPONSIBLE',
+  ADMIN: 'ADMIN'
+};
 
+exports.PackageCategory = exports.$Enums.PackageCategory = {
+  DOCUMENTS: 'DOCUMENTS',
+  ELECTRONICS: 'ELECTRONICS',
+  CLOTHING: 'CLOTHING',
+  MERCHANDISES: 'MERCHANDISES',
+  OTHERS: 'OTHERS'
+};
+
+exports.ReservationStatus = exports.$Enums.ReservationStatus = {
+  PENDING: 'PENDING',
+  IN_PROGRESS: 'IN_PROGRESS',
+  DELIVERED: 'DELIVERED',
+  CANCELLED: 'CANCELLED'
+};
 
 exports.Prisma.ModelName = {
   User: 'User',
-  Auth: 'Auth'
+  Auth: 'Auth',
+  Package: 'Package',
+  Reservation: 'Reservation'
 };
 
 /**

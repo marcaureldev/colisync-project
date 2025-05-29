@@ -3,7 +3,7 @@ import { NextResponse } from "next/server";
 import jwt from "jsonwebtoken";
 import { cookies } from "next/headers";
 
-const generateToken = (user: { id: string; email: string }) => {
+const generateToken = (user: { id: string; email: string; role: string }) => {
   const secret = process.env.JWT_SECRET_KEY;
   if (!secret) {
     throw new Error("JWT secret key is not defined");
@@ -65,7 +65,7 @@ export async function POST(request: Request) {
       );
     }
 
-    const access_token = generateToken({ id: user.id, email: user.email });
+    const access_token = generateToken({ id: user.id, email: user.email, role: user.role });
 
     const cookieStore = await cookies();
 

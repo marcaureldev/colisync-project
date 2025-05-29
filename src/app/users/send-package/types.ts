@@ -1,13 +1,10 @@
-export type PackageType = "standard" | "large" | "express";
-
-export type PackageCategory = "documents" | "electronics" | "clothing" | "merchandises" | "other";
+export type PackageCategory = "documents" | "electronics" | "clothing" | "merchandises" | "others";
 export interface PackageItem {
   id: string; 
   description: string;
-  quantity: string;
-  weight: string;
+  quantity: number;
+  weight: number;
   packageCategory: PackageCategory;
-  // value: string;
   imageFile: File | null;
 }
 

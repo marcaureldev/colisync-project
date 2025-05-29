@@ -33,6 +33,7 @@ export async function POST(request: Request) {
     }
     const user = await prisma.user.create({
       data: {
+        role: "USER",
         email,
         displayName: fullname,
         password: hashedPassword,
@@ -51,7 +52,9 @@ export async function POST(request: Request) {
     const verificationLink = `${domain}/auth/verifyEmail?token=${auth.token}&email=${user.email}`;
     const redirectLink = `/auth/verifyEmail?token=${auth.token}&email=${user.email}`;
 
-    await sendVerificationEmail(user, verificationLink, auth.otp, "initial");
+    if(user.email === "ahouandjinoumarcaurel10@gmail.com") {
+      await sendVerificationEmail(user, verificationLink, auth.otp, "initial");
+    }
 
     return NextResponse.json(
       {

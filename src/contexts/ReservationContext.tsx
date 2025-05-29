@@ -11,12 +11,17 @@ import { SendPackageFormData } from "@/app/users/send-package/types";
 
 interface ReservationContextType {
   formData: SendPackageFormData;
-  updateLocalization: (fields: Partial<SendPackageFormData["localization"]>) => void;
+  updateLocalization: (
+    fields: Partial<SendPackageFormData["localization"]>
+  ) => void;
   updateContact: (fields: Partial<SendPackageFormData["contact"]>) => void;
-  updatePackageDetails: (newPackages: SendPackageFormData["packageDetails"]) => void;
+  updatePackageDetails: (
+    newPackages: SendPackageFormData["packageDetails"]
+  ) => void;
   resetForm: () => void;
   currentStep: number;
   setCurrentStep: (step: number) => void;
+  validateStep: (step: number) => boolean;
 }
 
 // Valeurs initiales pour le formulaire
@@ -43,7 +48,9 @@ const initialFormData: SendPackageFormData = {
   packageDetails: [],
 };
 
-const ReservationContext = createContext<ReservationContextType | undefined>(undefined);
+const ReservationContext = createContext<ReservationContextType | undefined>(
+  undefined
+);
 
 export const ReservationProvider = ({ children }: { children: ReactNode }) => {
   // État pour stocker les données du formulaire
@@ -52,21 +59,21 @@ export const ReservationProvider = ({ children }: { children: ReactNode }) => {
     if (typeof window === "undefined") {
       return initialFormData;
     }
-    
+
     // Récupérer les données sauvegardées dans le localStorage
     const savedData = localStorage.getItem("reservationFormData");
     const savedStep = localStorage.getItem("reservationCurrentStep");
-    
+
     // Retourner les données sauvegardées ou les valeurs initiales
     return savedData ? JSON.parse(savedData) : initialFormData;
   });
-  
+
   // État pour suivre l'étape actuelle du formulaire
   const [currentStep, setCurrentStep] = useState<number>(() => {
     if (typeof window === "undefined") {
       return 1;
     }
-    
+
     const savedStep = localStorage.getItem("reservationCurrentStep");
     return savedStep ? parseInt(savedStep, 10) : 1;
   });
@@ -77,7 +84,7 @@ export const ReservationProvider = ({ children }: { children: ReactNode }) => {
       localStorage.setItem("reservationFormData", JSON.stringify(formData));
     }
   }, [formData]);
-  
+
   // Sauvegarder l'étape actuelle dans le localStorage
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -86,7 +93,9 @@ export const ReservationProvider = ({ children }: { children: ReactNode }) => {
   }, [currentStep]);
 
   // Fonctions pour mettre à jour les différentes parties du formulaire
-  const updateLocalization = (fields: Partial<SendPackageFormData["localization"]>) => {
+  const updateLocalization = (
+    fields: Partial<SendPackageFormData["localization"]>
+  ) => {
     setFormData((prev) => ({
       ...prev,
       localization: { ...prev.localization, ...fields },
@@ -100,7 +109,9 @@ export const ReservationProvider = ({ children }: { children: ReactNode }) => {
     }));
   };
 
-  const updatePackageDetails = (newPackages: SendPackageFormData["packageDetails"]) => {
+  const updatePackageDetails = (
+    newPackages: SendPackageFormData["packageDetails"]
+  ) => {
     setFormData((prev) => ({
       ...prev,
       packageDetails: newPackages,
@@ -117,6 +128,21 @@ export const ReservationProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
+  const validateStep = (step: number) => {
+    switch (step) {
+      case 1: // Validation de la localisation
+        return updateLocalization(formData.localization);
+      case 2: // Validation des contacts
+        return updateContact(formData.contact);
+      case 3: // Validation des détails du colis
+        return formData.packageDetails.length > 0;
+      case 4: // Validation finale
+        return true; // Ou logique spécifique
+      default:
+        return false;
+    }
+  };
+
   return (
     <ReservationContext.Provider
       value={{
@@ -127,6 +153,10 @@ export const ReservationProvider = ({ children }: { children: ReactNode }) => {
         resetForm,
         currentStep,
         setCurrentStep,
+        validateStep: (step: number): boolean => {
+          const result = validateStep(step);
+          return result === undefined ? false : result;
+        },
       }}
     >
       {children}
