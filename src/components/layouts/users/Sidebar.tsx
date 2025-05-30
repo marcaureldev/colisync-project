@@ -18,6 +18,7 @@ import React from "react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { usePathname } from "next/navigation";
+import { useAuth } from "@/hooks/useAuth";
 
 interface SidebarProps {
   toggleSidebar?: () => void;
@@ -25,6 +26,7 @@ interface SidebarProps {
 
 const Sidebar = ({ toggleSidebar }: SidebarProps) => {
   const pathname = usePathname();
+  const { logout, isLoggingOut, error } = useAuth();
 
   const navigateLinks = [
     {
@@ -140,7 +142,10 @@ const Sidebar = ({ toggleSidebar }: SidebarProps) => {
           <span>Paramètres</span>
         </Link>
 
-        <button className="w-full group flex items-center gap-3 p-3 rounded-lg hover:bg-red-100 dark:hover:bg-red-500/10 transition-colors text-gray-600 dark:text-gray-400 hover:text-red-600 dark:hover:text-red-400">
+        <button
+          onClick={logout}
+          className="w-full group flex items-center gap-3 p-3 rounded-lg hover:bg-red-100 dark:hover:bg-red-500/10 transition-colors text-gray-600 dark:text-gray-400 hover:text-red-600 dark:hover:text-red-400"
+        >
           <LogOut className="size-5 text-gray-500 dark:text-gray-400 group-hover:text-red-600 dark:group-hover:text-red-400" />
           <span>Déconnexion</span>
         </button>

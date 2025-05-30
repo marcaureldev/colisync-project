@@ -25,12 +25,14 @@ import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { useTheme } from "@/contexts/ThemeContext";
 import { useUser } from "@/contexts/UserContext";
+import { useAuth } from "@/hooks/useAuth";
 
 interface HeaderProps {
   toggleSidebar?: () => void;
 }
 
 const Header = ({ toggleSidebar }: HeaderProps) => {
+  const { logout, isLoggingOut, error } = useAuth();
   const { user, loading } = useUser();
   const { theme, toggleTheme } = useTheme();
   const [notifications, setNotifications] = useState([
@@ -169,7 +171,7 @@ const Header = ({ toggleSidebar }: HeaderProps) => {
                 <AvatarImage src="/placeholder-user.jpg" />
                 <AvatarFallback className="bg-blue-100 dark:bg-blue-500/20 text-blue-600 dark:text-blue-400">
                   {user?.displayName
-                    ? user.displayName.charAt(0).toUpperCase()
+                    ? user.displayName.charAt(0).toUpperCase() + user.displayName.split(" ")[1].charAt(0).toUpperCase()
                     : "U"}
                 </AvatarFallback>
               </Avatar>
@@ -196,7 +198,7 @@ const Header = ({ toggleSidebar }: HeaderProps) => {
               </span>
             </DropdownMenuItem>
             <DropdownMenuSeparator className="dark:bg-white/10" />
-            <DropdownMenuItem className="group text-red-500 dark:text-red-400 hover:text-red-600 dark:hover:text-red-300 data-[highlighted]:text-red-600 dark:data-[highlighted]:text-red-300 hover:bg-red-100 dark:hover:bg-red-500/10 data-[highlighted]:bg-red-100 dark:data-[highlighted]:bg-red-500/10 transition-colors">
+            <DropdownMenuItem onClick={logout} className="group text-red-500 dark:text-red-400 hover:text-red-600 dark:hover:text-red-300 data-[highlighted]:text-red-600 dark:data-[highlighted]:text-red-300 hover:bg-red-100 dark:hover:bg-red-500/10 data-[highlighted]:bg-red-100 dark:data-[highlighted]:bg-red-500/10 transition-colors">
               <LogOut className="mr-2 size-4 group-hover:text-red-600 dark:group-hover:text-red-300 group-data-[highlighted]:text-red-600 dark:group-data-[highlighted]:text-red-300 transition-colors" />
               <span className="group-hover:text-red-600 dark:group-hover:text-red-300 group-data-[highlighted]:text-red-600 dark:group-data-[highlighted]:text-red-300 transition-colors">
                 Déconnexion
