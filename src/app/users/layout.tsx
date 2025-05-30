@@ -26,14 +26,12 @@ export default function UserDashoardLayout({
           <div
             className={cn(
               "fixed top-0 left-0 h-full z-40 transition-transform duration-300 ease-in-out",
-              // Fond de la sidebar en mode superposition
               "dark:bg-gradient-to-r dark:from-[#0F123B]",
               sidebarOpen ? "translate-x-0" : "-translate-x-full",
               "w-full sm:w-1/2",
               "lg:sticky lg:top-0 lg:translate-x-0 lg:z-auto lg:h-screen lg:w-72 lg:min-w-72 lg:shadow-none"
             )}
           >
-            {/* La sidebar elle-même aura ses propres styles dark: */}
             <Sidebar toggleSidebar={toggleSidebar} />
           </div>
 
