@@ -17,6 +17,7 @@ import {
   ArrowRight,
   ArrowLeft,
 } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 const steps = [
   { id: 1, name: "Localisation & Date", Icon: MapPin },
@@ -60,6 +61,7 @@ const SendPackagePage = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [submitSuccess, setSubmitSuccess] = useState(false);
+  const router = useRouter();
 
   const handleSubmit = async () => {
     setIsSubmitting(true);
@@ -78,7 +80,7 @@ const SendPackagePage = () => {
       const packageDetailsForJson = formData.packageDetails.map(
         (pkg, index) => ({
           ...pkg,
-          imageFile: null, 
+          imageFile: null,
         })
       );
       submitFormData.append(
@@ -105,7 +107,8 @@ const SendPackagePage = () => {
       }
 
       setSubmitSuccess(true);
-      resetForm(); 
+      resetForm();
+      router.push("/users/bookings-list");
     } catch (error) {
       console.error("Erreur lors de la soumission:", error);
       setSubmitError(
@@ -187,9 +190,15 @@ const SendPackagePage = () => {
         ) : (
           <Button
             onClick={handleSubmit}
-            className="bg-green-600 hover:bg-green-700 dark:bg-green-500 dark:hover:bg-green-600 text-white"
+            disabled={isSubmitting}
+            className={`bg-green-600 hover:bg-green-700 dark:bg-green-500 dark:hover:bg-green-600 text-white flex space-x-2 items-center`}
           >
-            Confirmer la Commande
+            {isSubmitting && (
+              <span className="animate-spin size-5 rounded-full border-b-2 border-white mx-auto"></span>
+            )}
+            {isSubmitting
+              ? "Confirmation en cours..."
+              : " Confirmer la réservation"}
           </Button>
         )}
       </div>
