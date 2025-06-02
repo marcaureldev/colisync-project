@@ -4,11 +4,12 @@ import {
   LayoutDashboard,
   Send,
   History,
+  LibraryBig,
   User,
   CreditCard,
+  HelpCircle,
   Tag,
   Map,
-  HelpCircle,
   Settings,
   LogOut,
   X,
@@ -40,6 +41,11 @@ const Sidebar = ({ toggleSidebar }: SidebarProps) => {
       icon: Send,
     },
     {
+      name: "Mes réservations",
+      href: "/users/bookings-list",
+      icon: LibraryBig,
+    },
+    {
       name: "Suivi d'expédition",
       href: "/users/track-shipment",
       icon: PackageSearch,
@@ -58,11 +64,6 @@ const Sidebar = ({ toggleSidebar }: SidebarProps) => {
       name: "Paiements",
       href: "/users/payments",
       icon: CreditCard,
-    },
-    {
-      name: "Tarification",
-      href: "/users/pricing",
-      icon: Tag,
     },
     {
       name: "Carte",
