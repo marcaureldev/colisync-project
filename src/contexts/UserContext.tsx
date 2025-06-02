@@ -30,7 +30,6 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
       });
 
       const data = await response.json();
-
       if (response.ok) {
         setUser(data.user);
       } else if (response.status === 401) {

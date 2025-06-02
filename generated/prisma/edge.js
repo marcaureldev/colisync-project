@@ -205,11 +205,12 @@ const config = {
     "db"
   ],
   "activeProvider": "mongodb",
+  "postinstall": false,
   "inlineDatasources": {
     "db": {
       "url": {
         "fromEnvVar": "DATABASE_URL",
-        "value": "mongodb+srv://ahouandjinoumarcaurel:M%40rcaurel%405@dev-cluster.z04is.mongodb.net/coliSyncDB"
+        "value": null
       }
     }
   },
