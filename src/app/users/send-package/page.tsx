@@ -1,12 +1,12 @@
 "use client";
-import React, { useRef } from "react";
+import React, { useRef, useState } from "react";
 import StepperNav from "./components/StepperNav";
 import Step1_Localization, { Step1Ref } from "./components/Step1_Localization";
 import Step2_Contact, { Step2Ref } from "./components/Step2_Contact";
 import Step3_DetailsPackage, {
   Step3Ref,
 } from "./components/Step3_DetailsPackage";
-import Step4_ReviewAndConfirm from "./components/Step4_ReviewAndConfirm"; 
+import Step4_ReviewAndConfirm from "./components/Step4_ReviewAndConfirm";
 import { Button } from "@/components/ui/button";
 import { useReservation } from "@/contexts/ReservationContext";
 import {
@@ -26,30 +26,27 @@ const steps = [
 ];
 
 const SendPackagePage = () => {
-  // Utiliser le contexte au lieu des états locaux
   const {
     formData,
     updateLocalization,
     updateContact,
     updatePackageDetails,
     currentStep,
+    resetForm,
     setCurrentStep,
   } = useReservation();
 
   const step1Ref = useRef<Step1Ref>(null);
   const step2Ref = useRef<Step2Ref>(null);
   const step3Ref = useRef<Step3Ref>(null);
-  // Plus besoin de step4Ref
 
   const nextStep = async () => {
     let isValid = true;
-    // Logique de validation corrigée et adaptée :
     if (currentStep === 1 && step1Ref.current) {
       isValid = step1Ref.current.validateForm();
     } else if (currentStep === 2 && step2Ref.current) {
       isValid = step2Ref.current.validateForm();
     } else if (currentStep === 3 && step3Ref.current) {
-      // Validation pour Détails Colis
       isValid = step3Ref.current.validateForm();
     }
 
@@ -60,16 +57,63 @@ const SendPackagePage = () => {
 
   const prevStep = () => setCurrentStep(Math.max(currentStep - 1, 1));
 
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
+  const [submitSuccess, setSubmitSuccess] = useState(false);
+
   const handleSubmit = async () => {
-    // Plus besoin de validation pour l'étape 4 puisqu'elle est juste un récapitulatif
-    console.log("Formulaire complet soumis:", formData);
-    const response = await fetch("/api/users/send-package", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(formData),
-    });
+    setIsSubmitting(true);
+    setSubmitError(null);
+
+    try {
+      // Créer un FormData pour gérer les fichiers
+      const submitFormData = new FormData();
+
+      submitFormData.append(
+        "localization",
+        JSON.stringify(formData.localization)
+      );
+      submitFormData.append("contact", JSON.stringify(formData.contact));
+
+      const packageDetailsForJson = formData.packageDetails.map(
+        (pkg, index) => ({
+          ...pkg,
+          imageFile: null, 
+        })
+      );
+      submitFormData.append(
+        "packageDetails",
+        JSON.stringify(packageDetailsForJson)
+      );
+
+      // Ajouter les fichiers séparément avec des clés uniques
+      formData.packageDetails.forEach((pkg, index) => {
+        if (pkg.imageFile && pkg.imageFile instanceof File) {
+          submitFormData.append(`package_${index}_image`, pkg.imageFile);
+        }
+      });
+
+      const response = await fetch("/api/users/send-package", {
+        method: "POST",
+        body: submitFormData,
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || "Une erreur est survenue");
+      }
+
+      setSubmitSuccess(true);
+      resetForm(); 
+    } catch (error) {
+      console.error("Erreur lors de la soumission:", error);
+      setSubmitError(
+        error instanceof Error ? error.message : "Une erreur est survenue"
+      );
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const renderStepContent = () => {

@@ -12,7 +12,6 @@ const villesBenin = [
   { id: "bohicon", name: "Bohicon" },
   { id: "natitingou", name: "Natitingou" },
   { id: "abomey-calavi", name: "Abomey-Calavi" },
-  // ... autres villes
 ];
 
 const getCityName = (cityId: string) => {
@@ -29,7 +28,7 @@ const packageCategoryDisplay: Record<string, string> = {
 };
 
 interface Step4Props {
-  formData: SendPackageFormData; // Toutes les données du formulaire
+  formData: SendPackageFormData;
 }
 
 const DetailItem: React.FC<{
@@ -91,6 +90,28 @@ const Step4_ReviewAndConfirm: React.FC<Step4Props> = ({ formData }) => {
       year: "numeric",
     });
   };
+
+  const calculatePrice = (packages: PackageItem[]): number => {
+    // Prix de base pour chaque colis
+    const basePricePerPackage = 1000;
+
+    const pricePerKg = 500;
+
+    let totalPrice = 0;
+
+    packages.forEach((pkg) => {
+      let packagePrice = basePricePerPackage;
+      packagePrice += pkg.weight * pricePerKg;
+
+      packagePrice *= pkg.quantity;
+
+      totalPrice += packagePrice;
+    });
+
+    return totalPrice;
+  };
+
+  const totalPrice = calculatePrice(formData.packageDetails);
 
   return (
     <div className="space-y-6">
@@ -176,7 +197,7 @@ const Step4_ReviewAndConfirm: React.FC<Step4Props> = ({ formData }) => {
       </dl>
 
       <div className="text-right font-semibold text-lg text-blue-600 dark:text-blue-400">
-        Prix estimé: FCFA
+        Prix estimé: {totalPrice.toLocaleString()} FCFA
       </div>
 
       <Alert

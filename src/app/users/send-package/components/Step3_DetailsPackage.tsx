@@ -57,7 +57,7 @@ const initialModalPackageState: Omit<PackageItem, "id"> = {
 const packageCategoryOptions: { value: string; label: string }[] = [
   { value: "merchandises", label: "Marchandises" },
   { value: "documents", label: "Documents" },
-  { value: "electonics", label: "Appareils Electroniques" },
+  { value: "electronics", label: "Appareils Electroniques" }, // Corrigé: "electronics" au lieu de "electonics"
   { value: "clothing", label: "Vêtements" },
   { value: "others", label: "Autres" },
 ];

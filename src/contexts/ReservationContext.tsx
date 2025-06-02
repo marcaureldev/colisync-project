@@ -24,7 +24,6 @@ interface ReservationContextType {
   validateStep: (step: number) => boolean;
 }
 
-// Valeurs initiales pour le formulaire
 const initialLocationPoint = {
   ville: "",
   quartier: "",
@@ -53,22 +52,16 @@ const ReservationContext = createContext<ReservationContextType | undefined>(
 );
 
 export const ReservationProvider = ({ children }: { children: ReactNode }) => {
-  // État pour stocker les données du formulaire
   const [formData, setFormData] = useState<SendPackageFormData>(() => {
-    // Vérifier si nous sommes côté client
     if (typeof window === "undefined") {
       return initialFormData;
     }
 
-    // Récupérer les données sauvegardées dans le localStorage
     const savedData = localStorage.getItem("reservationFormData");
     const savedStep = localStorage.getItem("reservationCurrentStep");
-
-    // Retourner les données sauvegardées ou les valeurs initiales
     return savedData ? JSON.parse(savedData) : initialFormData;
   });
 
-  // État pour suivre l'étape actuelle du formulaire
   const [currentStep, setCurrentStep] = useState<number>(() => {
     if (typeof window === "undefined") {
       return 1;
@@ -118,7 +111,6 @@ export const ReservationProvider = ({ children }: { children: ReactNode }) => {
     }));
   };
 
-  // Fonction pour réinitialiser le formulaire
   const resetForm = () => {
     setFormData(initialFormData);
     setCurrentStep(1);
@@ -128,16 +120,29 @@ export const ReservationProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
-  const validateStep = (step: number) => {
+  const validateStep = (step: number): boolean => {
     switch (step) {
       case 1: // Validation de la localisation
-        return updateLocalization(formData.localization);
+        const locValid =
+          formData.localization.zoneDepart.ville !== "" &&
+          formData.localization.zoneDestination.ville !== "" &&
+          formData.localization.shippingDate !== "";
+        return locValid;
+
       case 2: // Validation des contacts
-        return updateContact(formData.contact);
+        const contactValid =
+          formData.contact.senderName !== "" &&
+          formData.contact.senderPhone !== "" &&
+          formData.contact.recipientName !== "" &&
+          formData.contact.recipientPhone !== "";
+        return contactValid;
+
       case 3: // Validation des détails du colis
         return formData.packageDetails.length > 0;
-      case 4: // Validation finale
-        return true; // Ou logique spécifique
+
+      case 4:
+        return true;
+
       default:
         return false;
     }
@@ -153,10 +158,7 @@ export const ReservationProvider = ({ children }: { children: ReactNode }) => {
         resetForm,
         currentStep,
         setCurrentStep,
-        validateStep: (step: number): boolean => {
-          const result = validateStep(step);
-          return result === undefined ? false : result;
-        },
+        validateStep,
       }}
     >
       {children}
@@ -164,7 +166,6 @@ export const ReservationProvider = ({ children }: { children: ReactNode }) => {
   );
 };
 
-// Hook personnalisé pour utiliser le contexte
 export const useReservation = () => {
   const context = useContext(ReservationContext);
   if (context === undefined) {
