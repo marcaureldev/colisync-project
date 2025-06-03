@@ -1,7 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import { Package, MapPin, User, Phone, Calendar, Search } from "lucide-react";
-
+import Link from "next/link";
 interface Location {
   city: string;
   district: string;
@@ -229,9 +229,16 @@ const ShippingReservations = () => {
                       <Package className="text-blue-600" size={24} />
                     </div>
                     <div>
-                      <h3 className="text-lg font-semibold text-gray-900">
-                        #{reservation.id?.slice(-8) || "N/A"}
-                      </h3>
+                      <Link
+                        href={{
+                          pathname: `/users/booking-details`,
+                          query: { id: `${reservation.id}` },
+                        }}
+                      >
+                        <h3 className="text-lg font-semibold text-gray-900">
+                          #{reservation.id?.slice(-8) || "N/A"}
+                        </h3>
+                      </Link>
                       <p className="text-gray-500 text-sm">
                         Créé le {formatDate(reservation.createdAt)}
                       </p>

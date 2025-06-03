@@ -1,5 +1,4 @@
 import { getAllBookings } from "@/lib/bookingsList";
-import { getCurrentUser } from "@/lib/currentUser";
 import { NextResponse } from "next/server";
 
 export async function GET() {
