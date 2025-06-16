@@ -81,12 +81,11 @@ const ReservationDetailsPage = () => {
         setLoading(true);
         setError(null);
 
-        const response = await fetch("/api/users/booking-details", {
-          method: "POST",
+        const response = await fetch(`/api/users/booking-details/${id}`, {
+          method: "GET",
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ id }),
         });
 
         const result = await response.json();

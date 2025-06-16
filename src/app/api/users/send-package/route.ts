@@ -151,10 +151,7 @@ export async function POST(request: Request) {
       success: true,
       reservation,
     });
-  } catch (error: any) {
-    console.error("❌ ERREUR DÉTAILLÉE:");
-    console.error("Message:", error.message);
-
+  } catch (error:any) {
     return NextResponse.json(
       {
         error: "Une erreur est survenue lors de la création de la réservation",
