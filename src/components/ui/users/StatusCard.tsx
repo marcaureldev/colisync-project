@@ -5,7 +5,7 @@ interface StatusCardProps {
   title: string;
   value: string | number;
   IconComponent: React.ForwardRefExoticComponent<Omit<LucideProps, "ref"> & React.RefAttributes<SVGSVGElement>>;
-  colorName: "blue" | "green" | "yellow"; 
+  colorName: "blue" | "green" | "yellow" | "purple"; 
 }
 
 const StatusCard: React.FC<StatusCardProps> = ({
@@ -29,6 +29,11 @@ const StatusCard: React.FC<StatusCardProps> = ({
       border: "border-yellow-500 dark:border-yellow-400",
       bgIcon: "bg-yellow-100 dark:bg-yellow-500/20",
       textIcon: "text-yellow-600 dark:text-yellow-400",
+    },
+    purple: {
+      border: "border-purple-500 dark:border-purple-400",
+      bgIcon: "bg-purple-100 dark:bg-purple-500/20",
+      textIcon: "text-purple-600 dark:text-purple-400",
     },
   };
 

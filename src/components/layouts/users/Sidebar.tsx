@@ -89,7 +89,7 @@ const Sidebar = ({ toggleSidebar }: SidebarProps) => {
 
       <div className="flex items-center gap-3 mb-8">
         <Truck className="size-8 text-blue-500 dark:text-blue-400" />
-        <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
+        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
           Coli<span className="text-blue-500 dark:text-blue-400">Sync</span>
         </h1>
       </div>

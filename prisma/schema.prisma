@@ -8,6 +8,12 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum UserStatus {
+  PENDING
+  ACTIVE
+  SUSPENDED
+}
+
 enum PackageCategory {
   DOCUMENTS
   ELECTRONICS
@@ -35,8 +41,8 @@ type ContactInfo {
 }
 
 enum Role {
-  USER
-  RESPONSIBLE
+  EXPEDITEUR
+  AGENT_GARE
   ADMIN
 }
 
@@ -45,14 +51,18 @@ model User {
   email        String        @unique
   displayName  String
   password     String
-  role         Role          
-  isAdmin      Boolean       @default(false)
+  role         Role
+  status       UserStatus    @default(PENDING)
   isActive     Boolean       @default(false)
+  gareId      String?        @db.ObjectId
   createdAt    DateTime      @default(now())
   updatedAt    DateTime      @updatedAt
+
   auths        Auth[]
   packages     Package[]
   reservations Reservation[]
+  InvitationCode InvitationCode[]
+  gare        Gare?    @relation(fields: [gareId], references: [id])
 }
 
 model Auth {
@@ -82,9 +92,9 @@ model Package {
 }
 
 model Reservation {
-  id                String       @id @default(auto()) @map("_id") @db.ObjectId
-  userId            String       @db.ObjectId
-  user              User         @relation(fields: [userId], references: [id])
+  id                String            @id @default(auto()) @map("_id") @db.ObjectId
+  userId            String            @db.ObjectId
+  user              User              @relation(fields: [userId], references: [id])
   departureLocation LocationInfo
   arrivalLocation   LocationInfo
   senderContact     ContactInfo
@@ -92,7 +102,31 @@ model Reservation {
   additionalInfo    String?
   shippingDate      DateTime
   status            ReservationStatus
-  createdAt         DateTime     @default(now())
-  updatedAt         DateTime     @updatedAt
+  createdAt         DateTime          @default(now())
+  updatedAt         DateTime          @updatedAt
   packages          Package[]
+}
+
+model InvitationCode {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  code      String   @unique
+  role      Role
+  gareId    String   @db.ObjectId
+  createdBy String   @db.ObjectId
+  usedBy    String?
+  isUsed    Boolean  @default(false)
+  createdAt DateTime @default(now())
+  expiresAt DateTime
+
+  creator User  @relation(fields: [createdBy], references: [id])
+  gare    Gare? @relation(fields: [gareId], references: [id])
+}
+
+model Gare {
+  id    String @id @default(auto()) @map("_id") @db.ObjectId
+  nom   String
+  ville String
+
+  agents         User[]
+  InvitationCode InvitationCode[]
 }
