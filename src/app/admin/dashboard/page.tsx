@@ -48,7 +48,7 @@ const page = () => {
         />
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6 mt-6">
+      {/* <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6 mt-6">
         <div className="bg-blue-600 hover:bg-blue-700 text-white p-4 rounded-lg flex items-center justify-between cursor-pointer transition-colors">
           <div className="flex space-x-2 items-center">
             <UserCheck />
@@ -63,14 +63,14 @@ const page = () => {
           </div>
           <ArrowRight />
         </div>
-        <div className="bg-purple-600 hover:bg-purple-700 text-white p-4 rounded-lg flex items-center justify-between cursor-pointer transition-colors">
+        <div className="bg-orange-900/80 hover:bg-orange-900/90 text-white p-4 rounded-lg flex items-center justify-between cursor-pointer transition-colors">
           <div className="flex space-x-2 items-center">
             <Map />
             <span>Gérer gares</span>
           </div>
           <ArrowRight />
         </div>
-      </div>
+      </div> */}
 
       <div className="mt-6 space-y-6">
         <h2 className="text-lg font-semibold mb-4 text-gray-800 dark:text-white">

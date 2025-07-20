@@ -47,7 +47,7 @@ const StatusCard: React.FC<StatusCardProps> = ({
         <div
           className={`p-3 ${selectedColor.bgIcon} rounded-full mr-4`}
         >
-          <IconComponent className={`${selectedColor.textIcon}`} size={24} />
+          <IconComponent className={`${selectedColor.textIcon}`} size={18} />
         </div>
         <div>
           <p className="text-sm text-gray-500 dark:text-gray-400">{title}</p>

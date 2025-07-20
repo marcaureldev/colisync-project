@@ -1,5 +1,5 @@
 "use client"
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import GeneratedCodeModal from "@/components/ui/admin/invitations/GeneratedCodeModal";
 import InvitationFormModal from "@/components/ui/admin/invitations/InvitationFormModal";
 import SelectionModal from "@/components/ui/admin/invitations/SelectionModal";
@@ -44,38 +44,10 @@ interface Invitation {
   status: InvitationStatus;
 }
 
-const mockInvitations: Invitation[] = [
-  {
-    id: "1",
-    code: "CMP-XYZ123",
-    type: "company",
-    name: "Transport Express",
-    email: "contact@transportexpress.com",
-    createdAt: "15 janvier 2024",
-    status: "pending",
-  },
-  {
-    id: "2",
-    code: "AGT-ABC456",
-    type: "agent",
-    name: "Jean Dupont",
-    email: "jean.dupont@example.com",
-    station: "Cotonou",
-    createdAt: "14 janvier 2024",
-    status: "used",
-  },
-  {
-    id: "3",
-    code: "CMP-DEF789",
-    type: "company",
-    name: "Rapid Transit",
-    createdAt: "13 janvier 2024",
-    status: "expired",
-  },
-];
-
 const InvitationManagement = () => {
-  const [invitations, setInvitations] = useState<Invitation[]>(mockInvitations);
+  const [invitations, setInvitations] = useState<Invitation[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [showTypeSelection, setShowTypeSelection] = useState(false);
   const [showInvitationForm, setShowInvitationForm] = useState(false);
   const [showGeneratedCode, setShowGeneratedCode] = useState(false);
@@ -84,6 +56,38 @@ const InvitationManagement = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [filterType, setFilterType] = useState('all');
   const [filterStatus, setFilterStatus] = useState('all');
+  const [page, setPage] = useState(1);
+  const [totalCount, setTotalCount] = useState(0);
+  const pageSize = 10;
+
+  // Fetch invitations from API
+  const fetchInvitations = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const params = new URLSearchParams({
+        search: searchTerm,
+        type: filterType,
+        status: filterStatus,
+        page: page.toString(),
+        pageSize: pageSize.toString(),
+      });
+      const response = await fetch(`/api/admin/invitations-list?${params.toString()}`);
+      const data = await response.json();
+      if (!data.success) throw new Error(data.error || 'Erreur lors du chargement');
+      setInvitations(data.invitations);
+      setTotalCount(data.totalCount);
+    } catch (err: any) {
+      setError(err.message || 'Erreur inconnue');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchInvitations();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchTerm, filterType, filterStatus, page]);
 
   const handleInviteClick = () => {
     setShowTypeSelection(true);
@@ -95,22 +99,27 @@ const InvitationManagement = () => {
     setShowInvitationForm(true);
   };
 
-  const handleFormSubmit = (data: any) => {
-    const newInvitation: Invitation = {
-      id: Date.now().toString(),
-      code: `${selectedType === 'company' ? 'CMP' : 'AGT'}-${Math.random().toString(36).substring(2, 8).toUpperCase()}`,
-      type: selectedType,
-      name: data.name,
-      email: data.email,
-      station: data.station,
-      createdAt: new Date().toLocaleDateString('fr-FR'),
-      status: 'pending'
-    };
-
-    setInvitations([newInvitation, ...invitations]);
-    setGeneratedInvitation(newInvitation);
-    setShowInvitationForm(false);
-    setShowGeneratedCode(true);
+  const handleFormSubmit = async (data: any) => {
+    setLoading(true);
+    setError(null);
+    try {
+      const response = await fetch('/api/admin/generate-invitation', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ...data, type: selectedType }),
+      });
+      const result = await response.json();
+      if (!result.success) throw new Error(result.error || 'Erreur lors de la création');
+      setGeneratedInvitation(result.invitation);
+      setShowInvitationForm(false);
+      setShowGeneratedCode(true);
+      setPage(1); // Retour à la première page
+      fetchInvitations(); // Refresh list
+    } catch (err: any) {
+      setError(err.message || 'Erreur inconnue');
+    } finally {
+      setLoading(false);
+    }
   };
 
   const getStatusBadge = (status: InvitationStatus) => {
@@ -140,15 +149,6 @@ const InvitationManagement = () => {
     );
   };
 
-  const filteredInvitations = invitations.filter(invitation => {
-    const matchesSearch = invitation.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         invitation.code.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesType = filterType === 'all' || invitation.type === filterType;
-    const matchesStatus = filterStatus === 'all' || invitation.status === filterStatus;
-    
-    return matchesSearch && matchesType && matchesStatus;
-  });
-
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -173,12 +173,12 @@ const InvitationManagement = () => {
                 <Input
                   placeholder="Rechercher..."
                   value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
+                  onChange={(e) => { setSearchTerm(e.target.value); setPage(1); }}
                   className="pl-10"
                 />
               </div>
             </div>
-            <Select value={filterType} onValueChange={setFilterType}>
+            <Select value={filterType} onValueChange={(v) => { setFilterType(v); setPage(1); }}>
               <SelectTrigger className="w-48">
                 <SelectValue placeholder="Tous les types" />
               </SelectTrigger>
@@ -188,7 +188,7 @@ const InvitationManagement = () => {
                 <SelectItem value="agent">Agent</SelectItem>
               </SelectContent>
             </Select>
-            <Select value={filterStatus} onValueChange={setFilterStatus}>
+            <Select value={filterStatus} onValueChange={(v) => { setFilterStatus(v); setPage(1); }}>
               <SelectTrigger className="w-48">
                 <SelectValue placeholder="Tous les statuts" />
               </SelectTrigger>
@@ -202,6 +202,10 @@ const InvitationManagement = () => {
           </div>
         </CardContent>
       </Card>
+
+      {/* Loading & Error */}
+      {loading && <div className="text-center text-blue-500">Chargement...</div>}
+      {error && <div className="text-center text-red-500">{error}</div>}
 
       {/* Invitations Table */}
       <Card>
@@ -219,7 +223,7 @@ const InvitationManagement = () => {
                 </tr>
               </thead>
               <tbody>
-                {filteredInvitations.map((invitation) => (
+                {invitations.map((invitation) => (
                   <tr key={invitation.id} className="border-b border-border hover:bg-muted/50">
                     <td className="py-3 px-4 font-medium text-foreground">{invitation.code}</td>
                     <td className="py-3 px-4">{getTypeBadge(invitation.type)}</td>
@@ -252,18 +256,26 @@ const InvitationManagement = () => {
               </tbody>
             </table>
           </div>
-          
+
           {/* Pagination */}
           <div className="flex items-center justify-between mt-4">
             <div className="text-sm text-muted-foreground">
-              Affichage de 1 à {filteredInvitations.length} sur {invitations.length} résultats
+              Affichage de {invitations.length > 0 ? ((page - 1) * pageSize + 1) : 0} à {Math.min(page * pageSize, totalCount)} sur {totalCount} résultats
             </div>
             <div className="flex items-center gap-2">
-              <Button variant="outline" size="sm" disabled>‹</Button>
-              <Button variant="outline" size="sm" className="bg-primary/10">1</Button>
-              <Button variant="outline" size="sm">2</Button>
-              <Button variant="outline" size="sm">3</Button>
-              <Button variant="outline" size="sm">›</Button>
+              <Button variant="outline" size="sm" disabled={page === 1} onClick={() => setPage(page - 1)}>‹</Button>
+              {[...Array(Math.ceil(totalCount / pageSize)).keys()].map((i) => (
+                <Button
+                  key={i + 1}
+                  variant="outline"
+                  size="sm"
+                  className={page === i + 1 ? "bg-primary/10" : ""}
+                  onClick={() => setPage(i + 1)}
+                >
+                  {i + 1}
+                </Button>
+              ))}
+              <Button variant="outline" size="sm" disabled={page === Math.ceil(totalCount / pageSize) || totalCount === 0} onClick={() => setPage(page + 1)}>›</Button>
             </div>
           </div>
         </CardContent>

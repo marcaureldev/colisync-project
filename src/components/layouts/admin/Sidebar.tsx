@@ -48,7 +48,7 @@ const Sidebar = ({ toggleSidebar }: SidebarProps) => {
         },
         {
           name: "Gares",
-          href: "/gares",
+          href: "/admin/management/stations",
           icon: MapPin,
         },
         {

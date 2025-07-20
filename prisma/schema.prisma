@@ -44,6 +44,7 @@ enum Role {
   EXPEDITEUR
   AGENT_GARE
   ADMIN
+  COMPANY
 }
 
 model User {
@@ -111,8 +112,10 @@ model InvitationCode {
   id        String   @id @default(auto()) @map("_id") @db.ObjectId
   code      String   @unique
   role      Role
-  gareId    String   @db.ObjectId
+  gareId    String?   @db.ObjectId
   createdBy String   @db.ObjectId
+  name      String?
+  email     String?
   usedBy    String?
   isUsed    Boolean  @default(false)
   createdAt DateTime @default(now())
