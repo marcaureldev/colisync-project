@@ -68,7 +68,14 @@ const VerifyEmail = () => {
         setIsVerified(true);
         // Redirection après un court délai pour montrer le message de succès
         setTimeout(() => {
-          router.push("/users/dashboard");
+          // Rediriger selon le rôle de l'utilisateur
+          if (result.userRole === "AGENT_GARE" || result.userRole === "COMPANY") {
+            // Les agents et entreprises doivent attendre la validation admin
+            router.push(`/auth/emailVerified?role=${result.userRole}&status=${result.userStatus}`);
+          } else {
+            // Les expéditeurs peuvent accéder directement au dashboard
+            router.push("/users/dashboard");
+          }
         }, 1500);
         return true;
       } else {
@@ -91,6 +98,8 @@ const VerifyEmail = () => {
   useEffect(() => {
     if (autoVerify && otp && token && !isVerifying) {
       setIsVerifying(true);
+      setIsLoading(true);
+      
       // Pré-remplir le formulaire OTP si on a le code dans l'URL
       form.setValue("otp", otp);
 
@@ -99,10 +108,11 @@ const VerifyEmail = () => {
         if (!success) {
           // Si échec, on laisse l'utilisateur essayer manuellement
           setIsVerifying(false);
+          setIsLoading(false);
         }
       });
     }
-  }, [autoVerify, otp, token]);
+  }, [autoVerify, otp, token, isVerifying]);
 
   useEffect(() => {
     if (!isTimerRunning) return;

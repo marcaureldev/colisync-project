@@ -1,6 +1,7 @@
 import { getCurrentUser } from "@/lib/currentUser";
 import { prisma } from "@/lib/db";
 import { NextResponse } from "next/server";
+import { sendInvitationEmail } from "@/lib/emailService";
 
 function isValidEmail(email: string) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
@@ -92,6 +93,19 @@ export async function POST(request: Request) {
       },
     });
 
+    // Envoi de l'email d'invitation si un email est fourni
+    let emailSent = false;
+    if (email) {
+      emailSent = await sendInvitationEmail({
+        to: email,
+        name: String(name),
+        code: String(code),
+        type: type as 'company' | 'agent',
+        stationName: gare && gare.denomination ? String(gare.denomination) : '',
+        expiresAt: invitation.expiresAt,
+      });
+    }
+
     // Statut de l'invitation
     const now = new Date();
     const status = invitation.isUsed
@@ -112,6 +126,7 @@ export async function POST(request: Request) {
         createdAt: invitation.createdAt.toISOString(),
         status,
       },
+      emailSent,
     });
   } catch (error) {
     return NextResponse.json(

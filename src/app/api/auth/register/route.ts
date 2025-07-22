@@ -5,7 +5,7 @@ import {
   generateToken,
   hashPassword,
 } from "@/lib/authUtility";
-import { sendVerificationEmail } from "@/handlers/sendVerificationEmail";
+import { sendVerificationEmailWithNodemailer } from "@/lib/emailService";
 import { Role, UserStatus } from "../../../../../generated/prisma/client";
 const domain = process.env.NEXT_PUBLIC_SITE_URL;
 
@@ -36,9 +36,10 @@ export async function POST(request: Request) {
     let userRole: Role = Role.EXPEDITEUR;
     let gareId = null;
     let userStatus: UserStatus = UserStatus.PENDING;
+    let invitation = null;
 
     if (invitationCode) {
-      const invitation = await prisma.invitationCode.findUnique({
+      invitation = await prisma.invitationCode.findUnique({
         where: {
           code: invitationCode,
         },
@@ -65,6 +66,7 @@ export async function POST(request: Request) {
       gareId = invitation.gareId;
       userStatus = "PENDING";
 
+      // Marquer l'invitation comme utilisée
       await prisma.invitationCode.update({
         where: {
           id: invitation.id,
@@ -106,8 +108,12 @@ export async function POST(request: Request) {
     const verificationLink = `${domain}/auth/verifyEmail?token=${auth.token}&email=${user.email}`;
     const redirectLink = `/auth/verifyEmail?token=${auth.token}&email=${user.email}`;
 
-    if (user.email === "ahouandjinoumarcaurel10@gmail.com") {
-      await sendVerificationEmail(user, verificationLink, auth.otp, "initial");
+    // Envoyer l'email de vérification (ne pas faire échouer l'inscription si l'email échoue)
+    try {
+      await sendVerificationEmailWithNodemailer(user, verificationLink, auth.otp);
+    } catch (emailError) {
+      console.error('Erreur lors de l\'envoi de l\'email de vérification:', emailError);
+      // Ne pas faire échouer l'inscription si l'email échoue
     }
 
     return NextResponse.json(
@@ -119,6 +125,7 @@ export async function POST(request: Request) {
       { status: 201 }
     );
   } catch (error) {
+    console.error('Erreur lors de l\'inscription:', error);
     return NextResponse.json(
       {
         error: "Une erreur est survenue lors de l'inscription",

@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Roboto } from "next/font/google";
 import "./globals.css";
-import { ThemeProvider } from "@/contexts/ThemeContext"; // Importer ThemeProvider
+import { ThemeProvider } from "@/contexts/ThemeContext";
 
 const roboto = Roboto({
   weight: ["300", "400", "500", "700"],
@@ -21,12 +21,8 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="fr" className={roboto.className} suppressHydrationWarning>
-      {" "}
-      {/* suppressHydrationWarning est utile avec le thème */}
       <body>
         <ThemeProvider>
-          {" "}
-          {/* Envelopper avec ThemeProvider */}
           {children}
         </ThemeProvider>
       </body>

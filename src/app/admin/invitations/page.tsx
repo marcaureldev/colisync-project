@@ -124,6 +124,32 @@ const InvitationManagement = () => {
     }
   };
 
+  const handleResendEmail = async (invitationId: string) => {
+    try {
+      const response = await fetch('/api/admin/resend-invitation', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ invitationId }),
+      });
+      const result = await response.json();
+      if (!result.success) throw new Error(result.error || 'Erreur lors de l\'envoi');
+      // Afficher un toast de succès
+      alert('Email envoyé avec succès');
+    } catch (err: any) {
+      setError(err.message || 'Erreur lors de l\'envoi de l\'email');
+    }
+  };
+
+  const handleCopyCode = async (code: string) => {
+    try {
+      await navigator.clipboard.writeText(code);
+      // Afficher un toast de succès
+      alert('Code copié dans le presse-papiers');
+    } catch (err) {
+      setError('Erreur lors de la copie du code');
+    }
+  };
+
   const getStatusBadge = (status: InvitationStatus) => {
     switch (status) {
       case 'pending':
@@ -262,12 +288,24 @@ const InvitationManagement = () => {
                     <td className="px-6 py-4 whitespace-nowrap">{getStatusBadge(invitation.status)}</td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex gap-2">
-                        <Button size="icon" variant="ghost" title="Copier le code">
+                        <Button 
+                          size="icon" 
+                          variant="ghost" 
+                          title="Copier le code"
+                          onClick={() => handleCopyCode(invitation.code)}
+                        >
                           <Copy className="h-4 w-4" />
                         </Button>
-                        <Button size="icon" variant="ghost" title="Envoyer par email">
-                          <Mail className="h-4 w-4" />
-                        </Button>
+                        {invitation.email && invitation.status === 'pending' && (
+                          <Button 
+                            size="icon" 
+                            variant="ghost" 
+                            title="Envoyer par email"
+                            onClick={() => handleResendEmail(invitation.id)}
+                          >
+                            <Mail className="h-4 w-4" />
+                          </Button>
+                        )}
                         <Button size="icon" variant="ghost">
                           <MoreHorizontal className="h-4 w-4" />
                         </Button>

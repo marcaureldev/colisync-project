@@ -38,18 +38,30 @@ const Login = () => {
       setIsLoading(true);
       const response = await fetch("/api/auth/login", {
         method: "POST",
+        headers: {
+          'Content-Type': 'application/json',
+        },
         body: JSON.stringify(values),
       });
 
       const data = await response.json();
 
-      if (response.ok) {
+      if (response.ok && data.success) {
         form.reset();
-        router.push("/users/dashboard");
+        // Rediriger selon le rôle de l'utilisateur
+        router.push(data.redirectUrl || "/users/dashboard");
       } else {
-        setError(data.error || "Une erreur est survenue lors de la connexion.");
+        // Gérer les erreurs spécifiques
+        if (data.code === "ACCOUNT_PENDING") {
+          setError("Votre compte n'est pas encore activé. Veuillez attendre la validation par un administrateur ou vérifier votre email.");
+        } else if (data.code === "ACCOUNT_SUSPENDED") {
+          setError("Votre compte a été suspendu. Veuillez contacter l'administrateur.");
+        } else {
+          setError(data.error || "Une erreur est survenue lors de la connexion.");
+        }
       }
     } catch (error) {
+      console.error('Erreur lors de la connexion:', error);
       setError("Une erreur est survenue lors de la connexion.");
     } finally {
       setIsLoading(false);

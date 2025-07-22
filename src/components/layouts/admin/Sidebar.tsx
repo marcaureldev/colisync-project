@@ -82,6 +82,11 @@ const Sidebar = ({ toggleSidebar }: SidebarProps) => {
           icon: Mail,
         },
         {
+          name: "Utilisateurs en attente",
+          href: "/admin/pending-users",
+          icon: Users,
+        },
+        {
           name: "Journal",
           href: "/journal",
           icon: FileText,
