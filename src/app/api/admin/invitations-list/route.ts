@@ -5,7 +5,6 @@ import { NextResponse } from "next/server";
 export async function GET(request: Request) {
   try {
     const user = await getCurrentUser();
-
     if (user.error || user.user?.role !== "ADMIN") {
       return NextResponse.json(
         { error: "Accès non autorisé", success: false },
@@ -17,8 +16,8 @@ export async function GET(request: Request) {
     const searchTerm = searchParams.get("search") || "";
     const filterType = searchParams.get("type") || "all";
     const filterStatus = searchParams.get("status") || "all";
-    const page = parseInt(searchParams.get("page") || "1");
-    const pageSize = parseInt(searchParams.get("pageSize") || "10");
+    const page = Math.max(1, parseInt(searchParams.get("page") || "1", 10));
+    const pageSize = Math.max(1, Math.min(100, parseInt(searchParams.get("pageSize") || "10", 10)));
 
     // Construire les conditions de filtrage
     const where: any = {
@@ -26,7 +25,10 @@ export async function GET(request: Request) {
     };
 
     if (searchTerm) {
-      where.code = { contains: searchTerm, mode: "insensitive" };
+      where.OR = [
+        { code: { contains: searchTerm, mode: "insensitive" } },
+        { name: { contains: searchTerm, mode: "insensitive" } },
+      ];
     }
 
     if (filterType !== "all") {
@@ -49,18 +51,38 @@ export async function GET(request: Request) {
       }
     }
 
-    // Récupérer les invitations
-    const [invitations, totalCount] = await Promise.all([
+    // Récupérer les invitations paginées
+    const [invitations, totalCount, pendingCount, usedCount, expiredCount] = await Promise.all([
       prisma.invitationCode.findMany({
         where,
         include: {
-          gare: true, // Inclure les infos de la gare si disponible
+          gare: true,
         },
         skip: (page - 1) * pageSize,
         take: pageSize,
         orderBy: { createdAt: "desc" },
       }),
       prisma.invitationCode.count({ where }),
+      prisma.invitationCode.count({
+        where: {
+          createdBy: user.user.id,
+          isUsed: false,
+          expiresAt: { gt: new Date() },
+        },
+      }),
+      prisma.invitationCode.count({
+        where: {
+          createdBy: user.user.id,
+          isUsed: true,
+        },
+      }),
+      prisma.invitationCode.count({
+        where: {
+          createdBy: user.user.id,
+          isUsed: false,
+          expiresAt: { lte: new Date() },
+        },
+      }),
     ]);
 
     const formattedInvitations = invitations.map((inv) => ({
@@ -68,8 +90,8 @@ export async function GET(request: Request) {
       code: inv.code,
       type: inv.role === "COMPANY" ? "company" : "agent",
       name: inv.name,
-      email: "",
-      station: inv.name,
+      email: inv.email || "",
+      station: inv.gare?.denomination || "",
       createdAt: inv.createdAt.toLocaleDateString("fr-FR"),
       status: inv.isUsed
         ? "used"
@@ -82,6 +104,9 @@ export async function GET(request: Request) {
       success: true,
       invitations: formattedInvitations,
       totalCount,
+      pendingCount,
+      usedCount,
+      expiredCount,
       page,
       pageSize,
     });

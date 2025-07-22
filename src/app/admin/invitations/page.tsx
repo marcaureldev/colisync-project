@@ -4,15 +4,8 @@ import GeneratedCodeModal from "@/components/ui/admin/invitations/GeneratedCodeM
 import InvitationFormModal from "@/components/ui/admin/invitations/InvitationFormModal";
 import SelectionModal from "@/components/ui/admin/invitations/SelectionModal";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import {
-  DropdownMenu,
-  DropdownMenuTrigger,
-  DropdownMenuContent,
-  DropdownMenuItem,
-} from "@/components/ui/dropdown-menu";
 import {
   Select,
   SelectTrigger,
@@ -28,7 +21,10 @@ import {
   Copy,
   Mail,
   MoreHorizontal,
+  Loader2,
+  Ticket,
 } from "lucide-react";
+import StatusCard from "@/components/ui/users/StatusCard";
 
 type InvitationType = "company" | "agent";
 type InvitationStatus = "pending" | "used" | "expired";
@@ -58,6 +54,9 @@ const InvitationManagement = () => {
   const [filterStatus, setFilterStatus] = useState('all');
   const [page, setPage] = useState(1);
   const [totalCount, setTotalCount] = useState(0);
+  const [pendingCount, setPendingCount] = useState(0);
+  const [usedCount, setUsedCount] = useState(0);
+  const [expiredCount, setExpiredCount] = useState(0);
   const pageSize = 10;
 
   // Fetch invitations from API
@@ -77,6 +76,9 @@ const InvitationManagement = () => {
       if (!data.success) throw new Error(data.error || 'Erreur lors du chargement');
       setInvitations(data.invitations);
       setTotalCount(data.totalCount);
+      setPendingCount(data.pendingCount);
+      setUsedCount(data.usedCount);
+      setExpiredCount(data.expiredCount);
     } catch (err: any) {
       setError(err.message || 'Erreur inconnue');
     } finally {
@@ -113,8 +115,8 @@ const InvitationManagement = () => {
       setGeneratedInvitation(result.invitation);
       setShowInvitationForm(false);
       setShowGeneratedCode(true);
-      setPage(1); // Retour à la première page
-      fetchInvitations(); // Refresh list
+      setPage(1);
+      fetchInvitations();
     } catch (err: any) {
       setError(err.message || 'Erreur inconnue');
     } finally {
@@ -125,9 +127,9 @@ const InvitationManagement = () => {
   const getStatusBadge = (status: InvitationStatus) => {
     switch (status) {
       case 'pending':
-        return <Badge variant="secondary" className="bg-yellow-100 text-yellow-800">En attente</Badge>;
+        return <Badge className="bg-yellow-100 text-yellow-800">En attente</Badge>;
       case 'used':
-        return <Badge variant="secondary" className="bg-green-100 text-green-800">Utilisé</Badge>;
+        return <Badge className="bg-green-100 text-green-800">Utilisé</Badge>;
       case 'expired':
         return <Badge variant="destructive">Expiré</Badge>;
       default:
@@ -149,152 +151,161 @@ const InvitationManagement = () => {
     );
   };
 
+  // Stats calculées
+  // const pendingCount = invitations.filter(inv => inv.status === 'pending').length;
+  // const usedCount = invitations.filter(inv => inv.status === 'used').length;
+  // const expiredCount = invitations.filter(inv => inv.status === 'expired').length;
+
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex justify-between items-center">
-        <div>
-          <h1 className="text-2xl font-bold text-foreground">Gestion des Invitations</h1>
-          <p className="text-muted-foreground">Créer et gérer les codes d'invitation</p>
-        </div>
-        <Button onClick={handleInviteClick} className="gap-2">
-          <Plus className="h-4 w-4" />
-          Inviter un utilisateur
-        </Button>
+    <div className="">
+      <h1 className="text-xl sm:text-2xl font-bold mb-6 text-gray-800 dark:text-white">
+        Gestion des Invitations
+      </h1>
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
+        <StatusCard
+          title="Total des invitations"
+          value={totalCount}
+          IconComponent={Mail}
+          colorName="blue"
+        />
+        <StatusCard
+          title="En attente"
+          value={pendingCount}
+          IconComponent={Mail}
+          colorName="yellow"
+        />
+        <StatusCard
+          title="Utilisées"
+          value={usedCount}
+          IconComponent={Mail}
+          colorName="green"
+        />
+        <StatusCard
+          title="Expirées"
+          value={expiredCount}
+          IconComponent={Mail}
+          colorName="purple"
+        />
       </div>
 
-      {/* Filters */}
-      <Card>
-        <CardContent className="pt-6">
-          <div className="flex flex-wrap gap-4">
-            <div className="flex-1 min-w-64">
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <Input
-                  placeholder="Rechercher..."
-                  value={searchTerm}
-                  onChange={(e) => { setSearchTerm(e.target.value); setPage(1); }}
-                  className="pl-10"
-                />
-              </div>
-            </div>
-            <Select value={filterType} onValueChange={(v) => { setFilterType(v); setPage(1); }}>
-              <SelectTrigger className="w-48">
-                <SelectValue placeholder="Tous les types" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">Tous les types</SelectItem>
-                <SelectItem value="company">Compagnie</SelectItem>
-                <SelectItem value="agent">Agent</SelectItem>
-              </SelectContent>
-            </Select>
-            <Select value={filterStatus} onValueChange={(v) => { setFilterStatus(v); setPage(1); }}>
-              <SelectTrigger className="w-48">
-                <SelectValue placeholder="Tous les statuts" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">Tous les statuts</SelectItem>
-                <SelectItem value="pending">En attente</SelectItem>
-                <SelectItem value="used">Utilisé</SelectItem>
-                <SelectItem value="expired">Expiré</SelectItem>
-              </SelectContent>
-            </Select>
+      <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between mb-6">
+        <div className="relative flex-1 max-w-lg">
+          <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+          <Input
+            placeholder="Rechercher par nom ou code..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="pl-10 bg-white"
+          />
+        </div>
+        <div className="flex gap-2">
+          <Select value={filterType} onValueChange={setFilterType}>
+            <SelectTrigger className="w-48 bg-white">
+              <SelectValue placeholder="Tous les types" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">Tous les types</SelectItem>
+              <SelectItem value="company">Compagnie</SelectItem>
+              <SelectItem value="agent">Agent</SelectItem>
+            </SelectContent>
+          </Select>
+          <Select value={filterStatus} onValueChange={setFilterStatus}>
+            <SelectTrigger className="w-48 bg-white">
+              <SelectValue placeholder="Tous les statuts" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">Tous les statuts</SelectItem>
+              <SelectItem value="pending">En attente</SelectItem>
+              <SelectItem value="used">Utilisé</SelectItem>
+              <SelectItem value="expired">Expiré</SelectItem>
+            </SelectContent>
+          </Select>
+          <Button onClick={handleInviteClick} className="bg-blue-600 hover:bg-blue-700 text-white">
+            <Plus className="h-4 w-4 mr-2" />
+            Inviter
+          </Button>
+        </div>
+      </div>
+
+      <div className="overflow-x-auto rounded-lg shadow-sm border border-border/30 bg-white min-h-[200px] flex flex-col justify-center">
+        {loading ? (
+          <div className="flex flex-col items-center justify-center py-16">
+            <Loader2 className="h-8 w-8 animate-spin text-blue-400 mb-4" />
+            <span className="text-blue-600 font-medium">Chargement...</span>
           </div>
-        </CardContent>
-      </Card>
-
-      {/* Loading & Error */}
-      {loading && <div className="text-center text-blue-500">Chargement...</div>}
-      {error && <div className="text-center text-red-500">{error}</div>}
-
-      {/* Invitations Table */}
-      <Card>
-        <CardContent className="pt-6">
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead>
-                <tr className="border-b border-border">
-                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">CODE</th>
-                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">TYPE</th>
-                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">NOM</th>
-                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">DATE DE CRÉATION</th>
-                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">STATUT</th>
-                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground">ACTIONS</th>
-                </tr>
-              </thead>
-              <tbody>
-                {invitations.map((invitation) => (
-                  <tr key={invitation.id} className="border-b border-border hover:bg-muted/50">
-                    <td className="py-3 px-4 font-medium text-foreground">{invitation.code}</td>
-                    <td className="py-3 px-4">{getTypeBadge(invitation.type)}</td>
-                    <td className="py-3 px-4 text-foreground">{invitation.name}</td>
-                    <td className="py-3 px-4 text-muted-foreground">{invitation.createdAt}</td>
-                    <td className="py-3 px-4">{getStatusBadge(invitation.status)}</td>
-                    <td className="py-3 px-4">
+        ) : error ? (
+          <div className="flex flex-col items-center justify-center py-16">
+            <span className="text-red-500 font-medium mb-2">{error}</span>
+            <Button onClick={() => fetchInvitations()} className="mt-2">Réessayer</Button>
+          </div>
+        ) : (
+          <table className="min-w-full divide-y divide-border">
+            <thead className="bg-muted/50">
+              <tr>
+                <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">CODE</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">TYPE</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">NOM</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">DATE DE CRÉATION</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">STATUT</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">ACTIONS</th>
+              </tr>
+            </thead>
+            <tbody className="bg-white divide-y divide-border">
+              {invitations.length > 0 ? (
+                invitations.map((invitation) => (
+                  <tr key={invitation.id} className="hover:bg-muted/30 transition-colors">
+                    <td className="px-6 py-4 whitespace-nowrap font-medium text-foreground">{invitation.code}</td>
+                    <td className="px-6 py-4 whitespace-nowrap">{getTypeBadge(invitation.type)}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-foreground">{invitation.name}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-muted-foreground">{invitation.createdAt}</td>
+                    <td className="px-6 py-4 whitespace-nowrap">{getStatusBadge(invitation.status)}</td>
+                    <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex gap-2">
-                        <Button size="sm" variant="outline">
+                        <Button size="icon" variant="ghost" title="Copier le code">
                           <Copy className="h-4 w-4" />
                         </Button>
-                        <Button size="sm" variant="outline">
+                        <Button size="icon" variant="ghost" title="Envoyer par email">
                           <Mail className="h-4 w-4" />
                         </Button>
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" size="sm">
-                              <MoreHorizontal className="h-4 w-4" />
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end">
-                            <DropdownMenuItem>Régénérer</DropdownMenuItem>
-                            <DropdownMenuItem className="text-destructive">Révoquer</DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
+                        <Button size="icon" variant="ghost">
+                          <MoreHorizontal className="h-4 w-4" />
+                        </Button>
                       </div>
                     </td>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan={6} className="px-6 py-16 text-center text-muted-foreground">
+                    <div className="flex flex-col items-center gap-3">
+                      <Ticket className="h-10 w-10 text-muted-foreground mb-2" />
+                      <span className="text-lg font-medium">Aucune invitation trouvée</span>
+                      <span className="text-sm">
+                        {searchTerm || filterType !== 'all' || filterStatus !== 'all'
+                          ? "Aucune invitation ne correspond aux filtres."
+                          : "Commencez par créer une invitation."}
+                      </span>
+                    </div>
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        )}
+      </div>
 
-          {/* Pagination */}
-          <div className="flex items-center justify-between mt-4">
-            <div className="text-sm text-muted-foreground">
-              Affichage de {invitations.length > 0 ? ((page - 1) * pageSize + 1) : 0} à {Math.min(page * pageSize, totalCount)} sur {totalCount} résultats
-            </div>
-            <div className="flex items-center gap-2">
-              <Button variant="outline" size="sm" disabled={page === 1} onClick={() => setPage(page - 1)}>‹</Button>
-              {[...Array(Math.ceil(totalCount / pageSize)).keys()].map((i) => (
-                <Button
-                  key={i + 1}
-                  variant="outline"
-                  size="sm"
-                  className={page === i + 1 ? "bg-primary/10" : ""}
-                  onClick={() => setPage(i + 1)}
-                >
-                  {i + 1}
-                </Button>
-              ))}
-              <Button variant="outline" size="sm" disabled={page === Math.ceil(totalCount / pageSize) || totalCount === 0} onClick={() => setPage(page + 1)}>›</Button>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Modals */}
       <SelectionModal
         isOpen={showTypeSelection}
         onClose={() => setShowTypeSelection(false)}
         onSelectType={handleTypeSelect}
       />
-
       <InvitationFormModal
         isOpen={showInvitationForm}
         onClose={() => setShowInvitationForm(false)}
         type={selectedType}
         onSubmit={handleFormSubmit}
       />
-
       <GeneratedCodeModal
         isOpen={showGeneratedCode}
         onClose={() => setShowGeneratedCode(false)}

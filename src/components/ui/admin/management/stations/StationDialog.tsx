@@ -23,39 +23,58 @@ interface Gare {
 interface StationDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  gare?: Gare | null;
-  onSave: (nom: string, ville: string) => void;
+  gare?: any | null;
+  onSave: (
+    denomination: string,
+    city: string,
+    phoneNumber: string,
+    horaireOuverture: string,
+    horaireFermeture: string
+  ) => void;
 }
 
 export function StationDialog({ open, onOpenChange, gare, onSave }: StationDialogProps) {
-  const [nom, setNom] = useState('');
-  const [ville, setVille] = useState('');
+  const [denomination, setDenomination] = useState('');
+  const [city, setCity] = useState('');
+  const [adress, setAdress] = useState('');
+  const [phoneNumber, setPhoneNumber] = useState('');
+  const [horaireOuverture, setHoraireOuverture] = useState('');
+  const [horaireFermeture, setHoraireFermeture] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
   const isEditing = !!gare;
 
   useEffect(() => {
     if (gare) {
-      setNom(gare.nom);
-      setVille(gare.ville);
+      setDenomination(gare.denomination || '');
+      setCity(gare.city || '');
+      setAdress(gare.adress || '');
+      setPhoneNumber(gare.phoneNumber || '');
+      setHoraireOuverture(gare.horaireOuverture || '');
+      setHoraireFermeture(gare.horaireFermeture || '');
     } else {
-      setNom('');
-      setVille('');
+      setDenomination('');
+      setCity('');
+      setAdress('');
+      setPhoneNumber('');
+      setHoraireOuverture('');
+      setHoraireFermeture('');
     }
   }, [gare, open]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!nom.trim() || !ville.trim()) return;
-    
+    if (!denomination.trim() || !city.trim() || !phoneNumber.trim() || !horaireOuverture.trim() || !horaireFermeture.trim()) return;
     setIsLoading(true);
-    
-    // Simulate API call
-    setTimeout(() => {
-      onSave(nom.trim(), ville.trim());
-      setIsLoading(false);
-      onOpenChange(false);
-    }, 500);
+    await onSave(
+      denomination.trim(),
+      city.trim(),
+      phoneNumber.trim(),
+      horaireOuverture.trim(),
+      horaireFermeture.trim()
+    );
+    setIsLoading(false);
+    onOpenChange(false);
   };
 
   return (
@@ -73,44 +92,79 @@ export function StationDialog({ open, onOpenChange, gare, onSave }: StationDialo
             }
           </DialogDescription>
         </DialogHeader>
-        
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="nom" className="text-sm font-medium">
+              <Label htmlFor="denomination" className="text-sm font-medium">
                 Nom de la gare
               </Label>
               <div className="relative">
                 <Input
-                  id="nom"
+                  id="denomination"
                   placeholder="Ex: Gare du Nord"
-                  value={nom}
-                  onChange={(e) => setNom(e.target.value)}
+                  value={denomination}
+                  onChange={(e) => setDenomination(e.target.value)}
                   className="pl-10"
                   required
                 />
                 <Building className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
               </div>
             </div>
-            
             <div className="space-y-2">
-              <Label htmlFor="ville" className="text-sm font-medium">
+              <Label htmlFor="city" className="text-sm font-medium">
                 Ville
               </Label>
               <div className="relative">
                 <Input
-                  id="ville"
+                  id="city"
                   placeholder="Ex: Paris"
-                  value={ville}
-                  onChange={(e) => setVille(e.target.value)}
+                  value={city}
+                  onChange={(e) => setCity(e.target.value)}
                   className="pl-10"
                   required
                 />
                 <MapPin className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
               </div>
             </div>
+            <div className="space-y-2">
+              <Label htmlFor="phoneNumber" className="text-sm font-medium">
+                Téléphone
+              </Label>
+              <Input
+                id="phoneNumber"
+                placeholder="Ex: 01 23 45 67 89"
+                value={phoneNumber}
+                onChange={(e) => setPhoneNumber(e.target.value)}
+                required
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="horaireOuverture" className="text-sm font-medium">
+                Horaire d'ouverture
+              </Label>
+              <input
+                type="time"
+                id="horaireOuverture"
+                className="w-full border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                value={horaireOuverture}
+                onChange={(e) => setHoraireOuverture(e.target.value)}
+                required
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="horaireFermeture" className="text-sm font-medium">
+                Horaire de fermeture
+              </Label>
+              <input
+                type="time"
+                id="horaireFermeture"
+                className="w-full border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                value={horaireFermeture}
+                onChange={(e) => setHoraireFermeture(e.target.value)}
+                required
+              />
+            </div>
           </div>
-
           <DialogFooter>
             <Button
               type="button"
@@ -122,8 +176,8 @@ export function StationDialog({ open, onOpenChange, gare, onSave }: StationDialo
             </Button>
             <Button 
               type="submit" 
-              disabled={isLoading || !nom.trim() || !ville.trim()}
-              className="bg-gradient-blue-600 hover:bg-gradient-blue-700"
+              disabled={isLoading || !denomination.trim() || !city.trim() || !phoneNumber.trim() || !horaireOuverture.trim() || !horaireFermeture.trim()}
+              className="bg-blue-600 hover:bg-blue-700 text-white"
             >
               {isLoading ? (
                 <span className="flex items-center gap-2">

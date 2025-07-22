@@ -126,10 +126,15 @@ model InvitationCode {
 }
 
 model Gare {
-  id    String @id @default(auto()) @map("_id") @db.ObjectId
-  nom   String
-  ville String
+  id                String   @id @default(auto()) @map("_id") @db.ObjectId
+  denomination      String 
+  city              String
+  phoneNumber       String
+  horaireOuverture  String
+  horaireFermeture  String
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
 
-  agents         User[]
-  InvitationCode InvitationCode[]
+  agents            User[]
+  InvitationCode    InvitationCode[]
 }
