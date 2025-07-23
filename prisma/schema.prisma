@@ -47,6 +47,30 @@ enum Role {
   COMPANY
 }
 
+enum NotificationType {
+  PENDING_USER
+  USER_ACTIVATED
+  USER_REJECTED
+  SYSTEM_ALERT
+}
+
+enum NotificationStatus {
+  UNREAD
+  READ
+}
+
+model Notification {
+  id        String            @id @default(auto()) @map("_id") @db.ObjectId
+  type      NotificationType
+  title     String
+  message   String
+  status    NotificationStatus @default(UNREAD)
+  targetUserId String?        @db.ObjectId
+  targetUser User?            @relation(fields: [targetUserId], references: [id])
+  createdAt DateTime          @default(now())
+  updatedAt DateTime          @updatedAt
+}
+
 model User {
   id           String        @id @default(auto()) @map("_id") @db.ObjectId
   email        String        @unique
@@ -63,6 +87,7 @@ model User {
   packages     Package[]
   reservations Reservation[]
   InvitationCode InvitationCode[]
+  notifications Notification[]
   gare        Gare?    @relation(fields: [gareId], references: [id])
 }
 

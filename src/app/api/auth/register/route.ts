@@ -116,6 +116,23 @@ export async function POST(request: Request) {
       // Ne pas faire échouer l'inscription si l'email échoue
     }
 
+    // Créer une notification pour les admins si l'utilisateur nécessite une validation
+    if (userRole === "AGENT_GARE" || userRole === "COMPANY") {
+      try {
+        await prisma.notification.create({
+          data: {
+            type: "PENDING_USER",
+            title: "Nouvel utilisateur en attente",
+            message: `${fullname} (${email}) - ${userRole} a créé un compte et attend une validation.`,
+            targetUserId: null, // Notification pour tous les admins
+          },
+        });
+      } catch (notificationError) {
+        console.error('Erreur lors de la création de la notification:', notificationError);
+        // Ne pas faire échouer l'inscription si la notification échoue
+      }
+    }
+
     return NextResponse.json(
       {
         success: true,

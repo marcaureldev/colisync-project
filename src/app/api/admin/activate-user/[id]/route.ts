@@ -1,7 +1,6 @@
 import { prisma } from "@/lib/db";
 import { NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/currentUser";
-import { sendAccountActivationEmail } from "@/lib/emailService";
 
 export async function POST(
   request: Request,
@@ -54,20 +53,15 @@ export async function POST(
       },
     });
 
-    // Envoyer l'email de confirmation
-    try {
-      await sendAccountActivationEmail(
-        {
-          email: user.email,
-          displayName: user.displayName,
-          role: user.role,
-        },
-        user.gare?.denomination
-      );
-    } catch (emailError) {
-      console.error('Erreur lors de l\'envoi de l\'email de confirmation:', emailError);
-      // Ne pas faire échouer l'activation si l'email échoue
-    }
+    // Créer une notification pour tous les admins
+    await prisma.notification.create({
+      data: {
+        type: "USER_ACTIVATED",
+        title: "Utilisateur activé",
+        message: `${user.displayName} (${user.email}) - ${user.role} a été activé avec succès.`,
+        targetUserId: null, // Notification pour tous les admins
+      },
+    });
 
     return NextResponse.json({
       success: true,

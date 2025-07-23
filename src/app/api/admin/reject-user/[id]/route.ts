@@ -46,6 +46,16 @@ export async function POST(
       },
     });
 
+    // Créer une notification pour tous les admins
+    await prisma.notification.create({
+      data: {
+        type: "USER_REJECTED",
+        title: "Utilisateur rejeté",
+        message: `${user.displayName} (${user.email}) - ${user.role} a été rejeté.`,
+        targetUserId: null, // Notification pour tous les admins
+      },
+    });
+
     return NextResponse.json({
       success: true,
       message: "Utilisateur rejeté avec succès",

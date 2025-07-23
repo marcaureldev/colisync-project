@@ -19,6 +19,7 @@ import { cn } from "@/lib/utils";
 import { usePathname } from "next/navigation";
 import { useAuth } from "@/hooks/useAuth";
 
+
 interface SidebarProps {
   toggleSidebar?: () => void;
 }
