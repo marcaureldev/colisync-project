@@ -1,8 +1,8 @@
 import { Badge } from "@/components/ui/badge";
 import { MapPin, User, Info, Package, ExternalLink, Trash2 } from "lucide-react";
-import { Card, CardContent } from "../../card";
+import { Card, CardContent } from "@/components/ui/card";
 import Link from "next/link";
-import { Button } from "../../button";
+import { Button } from "@/components/ui/button";
 
 interface Location {
   city: string;

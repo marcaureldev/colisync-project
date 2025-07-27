@@ -4,9 +4,9 @@ import { Plus, Search, Train, BarChart3, Building2, Users, Loader2 } from 'lucid
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
-import { StationDialog } from '@/components/ui/admin/management/stations/StationDialog';
+import { StationDialog } from '@/components/features/admin/management/stations/StationDialog';
 import { toast } from 'sonner';
-import StatusCard from '@/components/ui/users/StatusCard';
+import StatusCard from '@/components/features/users/StatusCard';
 
 
 interface Gare {
@@ -179,7 +179,7 @@ export default function ModernStations() {
               onChange={(e) => setSearch(e.target.value)}
               className="pl-10 py-5 bg-white"
             />
-          </div>
+  </div>
 
           <Button
             onClick={openAddDialog}
@@ -188,7 +188,7 @@ export default function ModernStations() {
             <Plus className="h-4 w-4 mr-2" />
             Ajouter une gare
           </Button>
-        </div>
+  </div>
 
         {/* Results Info */}
         {search && (
@@ -222,8 +222,8 @@ export default function ModernStations() {
                   <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">Fermeture</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">Agents</th>
                   <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">Actions</th>
-                </tr>
-              </thead> 
+          </tr>
+        </thead>
               <tbody className="bg-white divide-y divide-border">
                 {filteredGares.length > 0 ? (
                   filteredGares.map((gare) => (
@@ -271,11 +271,11 @@ export default function ModernStations() {
                           </Button>
                         )}
                       </div>
-                    </td>
-                  </tr>
+              </td>
+            </tr>
                 )}
-              </tbody>
-            </table>
+        </tbody>
+      </table>
           )}
         </div>
       </div>
@@ -287,6 +287,6 @@ export default function ModernStations() {
         gare={editGare}
         onSave={handleSave}
       />
-    </div>
+</div>
   );
 }

@@ -73,8 +73,8 @@ export function StationDialog({ open, onOpenChange, gare, onSave }: StationDialo
       horaireOuverture.trim(),
       horaireFermeture.trim()
     );
-    setIsLoading(false);
-    onOpenChange(false);
+      setIsLoading(false);
+      onOpenChange(false);
   };
 
   return (

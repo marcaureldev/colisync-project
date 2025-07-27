@@ -11,7 +11,7 @@ import {
 import { Package, Search } from "lucide-react";
 import BookingCard, {
   Reservation,
-} from "@/components/ui/users/bookings/BookingCard";
+} from "@/components/features/users/bookings/BookingCard";
 
 const Page = () => {
   const [reservations, setReservations] = useState<Reservation[]>([]);

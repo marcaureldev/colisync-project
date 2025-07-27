@@ -1,5 +1,5 @@
-import StatusCard from "@/components/ui/users/StatusCard";
-import ActiveShipmentLine from "@/components/ui/users/ActiveShipmentLine";
+import StatusCard from "@/components/features/users/StatusCard";
+import ActiveShipmentLine from "@/components/features/users/ActiveShipmentLine";
 import {
   Package,
   CheckCircle,
@@ -9,8 +9,8 @@ import {
 } from "lucide-react";
 import React from "react";
 import Link from "next/link";
-import RecentDeliveriesLine from "@/components/ui/users/RecentDeliveriesLine";
-import ActiveShipmentHead from "@/components/ui/users/ActiveShipmentHead";
+import RecentDeliveriesLine from "@/components/features/users/RecentDeliveriesLine";
+import ActiveShipmentHead from "@/components/features/users/ActiveShipmentHead";
 
 // Données d'exemple pour les expéditions
 const shipments = [

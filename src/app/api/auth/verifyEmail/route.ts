@@ -2,7 +2,7 @@ import { prisma } from "@/lib/db";
 import { NextResponse } from "next/server";
 import jwt from "jsonwebtoken";
 import { cookies } from "next/headers";
-import { sendAdminNotification } from "@/lib/emailService";
+
 
 const generateToken = (user: { id: string; email: string; role: string }) => {
   const secret = process.env.JWT_SECRET_KEY;
@@ -69,20 +69,18 @@ export async function POST(request: Request) {
       newStatus = "PENDING";
       isActive = false;
       
-      // Envoyer une notification aux admins
+      // Créer une notification pour les admins
       try {
-        await sendAdminNotification(
-          {
-            email: user.email,
-            displayName: user.displayName,
-            role: user.role,
-            createdAt: user.createdAt,
-            gareId: user.gareId,
+        await prisma.notification.create({
+          data: {
+            type: "PENDING_USER",
+            title: "Nouvel utilisateur en attente",
+            message: `${user.displayName} (${user.email}) - ${user.role} a vérifié son email et attend une validation.`,
+            targetUserId: null, // Notification pour tous les admins
           },
-          user.gare?.denomination
-        );
+        });
       } catch (notificationError) {
-        console.error('Erreur lors de l\'envoi de la notification admin:', notificationError);
+        console.error('Erreur lors de la création de la notification admin:', notificationError);
         // Ne pas faire échouer la vérification si la notification échoue
       }
     }

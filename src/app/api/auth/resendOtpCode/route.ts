@@ -1,4 +1,4 @@
-import { sendVerificationEmail } from "@/handlers/sendVerificationEmail";
+import { sendVerificationEmailWithNodemailer } from "@/lib/emailService";
 import { prisma } from "@/lib/db";
 import { NextResponse } from "next/server";
 const domain = process.env.NEXT_PUBLIC_SITE_URL;
@@ -18,7 +18,7 @@ export async function POST(request: Request) {
     }
     const verificationLink = `${domain}/auth/verifyEmail?token=${token}&email=${user.email}`;
 
-    await sendVerificationEmail(user, verificationLink, otp, "resend");
+    await sendVerificationEmailWithNodemailer(user, verificationLink, otp);
 
     return NextResponse.json(
       {

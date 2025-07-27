@@ -4,12 +4,12 @@ import { AlertCircle } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import { BookingDetails as BookingDetailsType } from "@/types/booking";
-import BookingHeader from "@/components/ui/users/booking-details/BookingHeader";
-import ItineraryCard from "@/components/ui/users/booking-details/ItineraryCard";
-import ContactCard from "@/components/ui/users/booking-details/ContactCard";
-import PackageSummary from "@/components/ui/users/booking-details/PackageSummary";
-import PackageList from "@/components/ui/users/booking-details/PackageList";
-import AdditionalInfo from "@/components/ui/users/booking-details/AdditionnalInfo";
+import BookingHeader from "@/components/features/users/booking-details/BookingHeader";
+import ItineraryCard from "@/components/features/users/booking-details/ItineraryCard";
+import ContactCard from "@/components/features/users/booking-details/ContactCard";
+import PackageSummary from "@/components/features/users/booking-details/PackageSummary";
+import PackageList from "@/components/features/users/booking-details/PackageList";
+import AdditionalInfo from "@/components/features/users/booking-details/AdditionnalInfo";
 import { useSearchParams, useRouter } from "next/navigation";
 
 

@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { Roboto } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/contexts/ThemeContext";
+import { NotificationProvider } from "@/contexts/NotificationContext";
+import { NotificationListener, NotificationsModal } from "@/components/features/notifications";
 
 const roboto = Roboto({
   weight: ["300", "400", "500", "700"],
@@ -23,7 +25,11 @@ export default function RootLayout({
     <html lang="fr" className={roboto.className} suppressHydrationWarning>
       <body>
         <ThemeProvider>
-          {children}
+          <NotificationProvider>
+            {children}
+            <NotificationsModal />
+            <NotificationListener />
+          </NotificationProvider>
         </ThemeProvider>
       </body>
     </html>

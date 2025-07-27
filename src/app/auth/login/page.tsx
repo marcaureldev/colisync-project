@@ -56,8 +56,8 @@ const Login = () => {
           setError("Votre compte n'est pas encore activé. Veuillez attendre la validation par un administrateur ou vérifier votre email.");
         } else if (data.code === "ACCOUNT_SUSPENDED") {
           setError("Votre compte a été suspendu. Veuillez contacter l'administrateur.");
-        } else {
-          setError(data.error || "Une erreur est survenue lors de la connexion.");
+      } else {
+        setError(data.error || "Une erreur est survenue lors de la connexion.");
         }
       }
     } catch (error) {

@@ -1,8 +1,8 @@
 "use client"
 import React, { useState, useEffect } from "react";
-import GeneratedCodeModal from "@/components/ui/admin/invitations/GeneratedCodeModal";
-import InvitationFormModal from "@/components/ui/admin/invitations/InvitationFormModal";
-import SelectionModal from "@/components/ui/admin/invitations/SelectionModal";
+import GeneratedCodeModal from "@/components/features/admin/invitations/GeneratedCodeModal";
+import InvitationFormModal from "@/components/features/admin/invitations/InvitationFormModal";
+import SelectionModal from "@/components/features/admin/invitations/SelectionModal";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -24,7 +24,7 @@ import {
   Loader2,
   Ticket,
 } from "lucide-react";
-import StatusCard from "@/components/ui/users/StatusCard";
+import StatusCard from "@/components/features/users/StatusCard";
 
 type InvitationType = "company" | "agent";
 type InvitationStatus = "pending" | "used" | "expired";
@@ -113,8 +113,8 @@ const InvitationManagement = () => {
       const result = await response.json();
       if (!result.success) throw new Error(result.error || 'Erreur lors de la création');
       setGeneratedInvitation(result.invitation);
-      setShowInvitationForm(false);
-      setShowGeneratedCode(true);
+    setShowInvitationForm(false);
+    setShowGeneratedCode(true);
       setPage(1);
       fetchInvitations();
     } catch (err: any) {
@@ -218,35 +218,35 @@ const InvitationManagement = () => {
       <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between mb-6">
         <div className="relative flex-1 max-w-lg">
           <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-          <Input
+                <Input
             placeholder="Rechercher par nom ou code..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
             className="pl-10 bg-white"
-          />
-        </div>
+                />
+              </div>
         <div className="flex gap-2">
-          <Select value={filterType} onValueChange={setFilterType}>
+            <Select value={filterType} onValueChange={setFilterType}>
             <SelectTrigger className="w-48 bg-white">
-              <SelectValue placeholder="Tous les types" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">Tous les types</SelectItem>
-              <SelectItem value="company">Compagnie</SelectItem>
-              <SelectItem value="agent">Agent</SelectItem>
-            </SelectContent>
-          </Select>
-          <Select value={filterStatus} onValueChange={setFilterStatus}>
+                <SelectValue placeholder="Tous les types" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Tous les types</SelectItem>
+                <SelectItem value="company">Compagnie</SelectItem>
+                <SelectItem value="agent">Agent</SelectItem>
+              </SelectContent>
+            </Select>
+            <Select value={filterStatus} onValueChange={setFilterStatus}>
             <SelectTrigger className="w-48 bg-white">
-              <SelectValue placeholder="Tous les statuts" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">Tous les statuts</SelectItem>
-              <SelectItem value="pending">En attente</SelectItem>
-              <SelectItem value="used">Utilisé</SelectItem>
-              <SelectItem value="expired">Expiré</SelectItem>
-            </SelectContent>
-          </Select>
+                <SelectValue placeholder="Tous les statuts" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Tous les statuts</SelectItem>
+                <SelectItem value="pending">En attente</SelectItem>
+                <SelectItem value="used">Utilisé</SelectItem>
+                <SelectItem value="expired">Expiré</SelectItem>
+              </SelectContent>
+            </Select>
           <Button onClick={handleInviteClick} className="bg-blue-600 hover:bg-blue-700 text-white">
             <Plus className="h-4 w-4 mr-2" />
             Inviter
@@ -275,8 +275,8 @@ const InvitationManagement = () => {
                 <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">DATE DE CRÉATION</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">STATUT</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">ACTIONS</th>
-              </tr>
-            </thead>
+                </tr>
+              </thead>
             <tbody className="bg-white divide-y divide-border">
               {invitations.length > 0 ? (
                 invitations.map((invitation) => (
@@ -303,12 +303,12 @@ const InvitationManagement = () => {
                             title="Envoyer par email"
                             onClick={() => handleResendEmail(invitation.id)}
                           >
-                            <Mail className="h-4 w-4" />
-                          </Button>
+                          <Mail className="h-4 w-4" />
+                        </Button>
                         )}
                         <Button size="icon" variant="ghost">
-                          <MoreHorizontal className="h-4 w-4" />
-                        </Button>
+                              <MoreHorizontal className="h-4 w-4" />
+                            </Button>
                       </div>
                     </td>
                   </tr>
@@ -328,11 +328,11 @@ const InvitationManagement = () => {
                   </td>
                 </tr>
               )}
-            </tbody>
-          </table>
+              </tbody>
+            </table>
         )}
-      </div>
-
+          </div>
+          
       <SelectionModal
         isOpen={showTypeSelection}
         onClose={() => setShowTypeSelection(false)}
